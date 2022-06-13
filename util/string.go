@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package utility
+package util
 
 // Return an empty string when string pointer is nil so
 // it's easier to do printing.
