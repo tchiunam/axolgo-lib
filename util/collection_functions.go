@@ -22,6 +22,40 @@ THE SOFTWARE.
 
 package util
 
+// Returns true if any of the items in the given slice
+// satisfies the predicate f.
+func Any(ss []string, f func(string) bool) bool {
+	for _, v := range ss {
+		if f(v) {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns true if all strings in the slice satisfy the
+// given predicate f.
+func All4s(ss []string, f func(string) bool) bool {
+	for _, v := range ss {
+		if !f(v) {
+			return false
+		}
+	}
+	return true
+}
+
+// Returns a new slice of strings containing all strings
+// in the given slice that satisfy the given predicate f.
+func Filter4s(ss []string, f func(string) bool) []string {
+	nss := make([]string, 0)
+	for _, v := range ss {
+		if f(v) {
+			nss = append(nss, v)
+		}
+	}
+	return nss
+}
+
 // Map collection function for string slice.
 // Function f is applied to all strings in the given slice
 // and a new slice containing the results is returned.
