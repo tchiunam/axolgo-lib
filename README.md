@@ -19,6 +19,17 @@ go get github.com/tchiunam/axolgo-lib@none
 
 See 'go help get' or https://golang.org/ref/mod#go-get for details.
 
+## Run test
+To run test:
+```
+go test ./...
+```
+
+To run test with coverage result:
+```
+go test -coverpkg=./... ./...
+```
+
 ---
 #### See more  
 1. [axolgo-aws](https://github.com/tchiunam/axolgo-aws) for using AWS SDK
