@@ -56,7 +56,7 @@ func TestAny4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := Any4s(c.Strings, c.PredicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("Any4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
+				t.Errorf("Any4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
 			}
 		})
 	}
@@ -90,7 +90,7 @@ func TestAll4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := All4s(c.Strings, c.PredicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("All4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
+				t.Errorf("All4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
 			}
 		})
 	}
