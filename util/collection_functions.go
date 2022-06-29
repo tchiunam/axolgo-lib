@@ -24,7 +24,7 @@ package util
 
 // Returns true if any of the items in the given slice
 // satisfies the predicate f.
-func Any(ss []string, f func(string) bool) bool {
+func Any4s(ss []string, f func(string) bool) bool {
 	for _, v := range ss {
 		if f(v) {
 			return true
