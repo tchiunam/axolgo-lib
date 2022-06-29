@@ -61,3 +61,37 @@ func TestAny4s(t *testing.T) {
 		})
 	}
 }
+
+// TestAll4s calls All4s to check for valid return values.
+func TestAll4s(t *testing.T) {
+	cases := map[string]struct {
+		Strings           []string
+		PredicateFunction TestStringPredicateFunction
+		ExpectBool        bool
+	}{
+		"empty strings without matching": {
+			Strings:           []string{},
+			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			ExpectBool:        false,
+		},
+		"all match": {
+			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
+			PredicateFunction: func(s string) bool { return len(s) > 2 },
+			ExpectBool:        true,
+		},
+		"at least one not match": {
+			Strings:           []string{"car", "bus", "truck", "train", "boat"},
+			PredicateFunction: func(s string) bool { return len(s) > 4 },
+			ExpectBool:        false,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			actual := All4s(c.Strings, c.PredicateFunction)
+			if actual != c.ExpectBool {
+				t.Errorf("All4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
+			}
+		})
+	}
+}

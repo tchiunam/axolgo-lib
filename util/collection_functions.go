@@ -36,6 +36,11 @@ func Any4s(ss []string, f func(string) bool) bool {
 // Returns true if all strings in the slice satisfy the
 // given predicate f.
 func All4s(ss []string, f func(string) bool) bool {
+	// If the slice is empty, it's considered to be false.
+	if len(ss) == 0 {
+		return false
+	}
+
 	for _, v := range ss {
 		if !f(v) {
 			return false
