@@ -29,13 +29,14 @@ import (
 
 // Predicate function type for testing predicate function
 // with string array.
-type TestStringPredicateFunction func(string) bool
+type TestStringPredicateFunction1 func(string) bool
+type TestStringPredicateFunction2 func(string) string
 
 // TestAny4s calls Any4s to check for valid return values.
 func TestAny4s(t *testing.T) {
 	cases := map[string]struct {
 		Strings           []string
-		PredicateFunction TestStringPredicateFunction
+		PredicateFunction TestStringPredicateFunction1
 		ExpectBool        bool
 	}{
 		"empty strings without matching": {
@@ -69,7 +70,7 @@ func TestAny4s(t *testing.T) {
 func TestAll4s(t *testing.T) {
 	cases := map[string]struct {
 		Strings           []string
-		PredicateFunction TestStringPredicateFunction
+		PredicateFunction TestStringPredicateFunction1
 		ExpectBool        bool
 	}{
 		"empty strings without matching": {
@@ -103,7 +104,7 @@ func TestAll4s(t *testing.T) {
 func TestFilter4s(t *testing.T) {
 	cases := map[string]struct {
 		Strings           []string
-		PredicateFunction TestStringPredicateFunction
+		PredicateFunction TestStringPredicateFunction1
 		ExpectStringArray []string
 	}{
 		"empty strings without matching": {
@@ -123,6 +124,30 @@ func TestFilter4s(t *testing.T) {
 			actual := Filter4s(c.Strings, c.PredicateFunction)
 			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
 				t.Errorf("Filter4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
+			}
+		})
+	}
+}
+
+// TestMap4s calls Map4s to check for valid return values.
+func TestMap4s(t *testing.T) {
+	cases := map[string]struct {
+		Strings           []string
+		PredicateFunction TestStringPredicateFunction2
+		ExpectStringArray []string
+	}{
+		"append to string": {
+			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
+			PredicateFunction: func(s string) string { return s + "!" },
+			ExpectStringArray: []string{"dog!", "cat!", "mouse!", "bird!", "fish!"},
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			actual := Map4s(c.Strings, c.PredicateFunction)
+			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
+				t.Errorf("Map4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
 			}
 		})
 	}
