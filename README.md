@@ -1,5 +1,6 @@
 # axolgo-lib, the Axolotl Library in Golang
 [![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
