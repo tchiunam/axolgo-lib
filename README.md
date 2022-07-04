@@ -3,6 +3,8 @@
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
+Go package: https://pkg.go.dev/github.com/tchiunam/axolgo-lib
+
 ## Use it with your Go module
 To add as dependency for your package or upgrade to the latest version:
 ```
@@ -35,4 +37,5 @@ go test -coverpkg=./... ./...
 ---
 #### See more  
 1. [axolgo-aws](https://github.com/tchiunam/axolgo-aws) for using AWS SDK
+1. [axolgo-gcp](https://github.com/tchiunam/axolgo-gcp) for using GCP API
 2. [axolgo-cli](https://github.com/tchiunam/axolgo-cli) for using Axolgo in command line
