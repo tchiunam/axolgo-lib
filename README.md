@@ -3,6 +3,7 @@
 [![codecov](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG)](https://codecov.io/gh/tchiunam/axolgo-lib)
 [![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
@@ -45,3 +46,7 @@ go test -coverpkg=./... ./...
 #### See more  
 1. [axolgo-cloud](https://github.com/tchiunam/axolgo-cloud) for using cloud library (AWS SDK and GCP API)
 2. [axolgo-cli](https://github.com/tchiunam/axolgo-cli) for using Axolgo in command line
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_large)
