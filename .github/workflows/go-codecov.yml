@@ -1,6 +1,7 @@
-name: Go
+name: Go-v2
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
@@ -23,7 +24,7 @@ jobs:
       run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
 
     - name: Build
       run: go build -v ./...
