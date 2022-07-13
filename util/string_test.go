@@ -47,7 +47,7 @@ func TestHushedStringPtr(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := HushedStringPtr(c.StringPtr)
 			if *actual != c.ExpectString {
-				t.Errorf("HushedStringPtr(%v) = %v, want %v, case %q", c.StringPtr, *actual, c.ExpectString, name)
+				t.Errorf("HushedStringPtr(%v) = %v, want %v", c.StringPtr, *actual, c.ExpectString)
 			}
 		})
 	}
