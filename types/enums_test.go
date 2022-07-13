@@ -42,7 +42,7 @@ func TestAxolVarTemplateStringFieldWithKeyValueNew(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			a := AxolVarTemplateStringFieldWithKeyValue.New(c.Strings...)
 			if a != c.ExpectString {
-				t.Errorf("Expected %s, got %s, case %q", c.ExpectString, a, name)
+				t.Errorf("Expected %s, got %s", c.ExpectString, a)
 			}
 		})
 	}

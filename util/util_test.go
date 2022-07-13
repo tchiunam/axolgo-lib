@@ -56,7 +56,7 @@ func TestExpandPath(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			path := ExpandPath(c.Path)
 			if path != c.ExpectPath {
-				t.Errorf("ExpandPath(%q) = %q, want %q, case %q", c.Path, path, c.ExpectPath, name)
+				t.Errorf("ExpandPath(%q) = %q, want %q", c.Path, path, c.ExpectPath)
 			}
 		})
 	}

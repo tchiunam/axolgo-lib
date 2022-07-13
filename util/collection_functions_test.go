@@ -60,7 +60,7 @@ func TestAny4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := Any4s(c.Strings, c.PredicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("Any4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
+				t.Errorf("Any4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
 			}
 		})
 	}
@@ -94,7 +94,7 @@ func TestAll4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := All4s(c.Strings, c.PredicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("All4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
+				t.Errorf("All4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
 			}
 		})
 	}
@@ -123,7 +123,7 @@ func TestFilter4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := Filter4s(c.Strings, c.PredicateFunction)
 			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Filter4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
+				t.Errorf("Filter4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray)
 			}
 		})
 	}
@@ -147,7 +147,7 @@ func TestMap4s(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			actual := Map4s(c.Strings, c.PredicateFunction)
 			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Map4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
+				t.Errorf("Map4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray)
 			}
 		})
 	}
