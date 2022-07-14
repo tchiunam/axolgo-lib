@@ -35,32 +35,32 @@ type TestStringPredicateFunction2 func(string) string
 // TestAny4s calls Any4s to check for valid return values.
 func TestAny4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
+		input             []string
+		predicateFunction TestStringPredicateFunction1
 		ExpectBool        bool
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
 			ExpectBool:        false,
 		},
 		"at least one matches": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
 			ExpectBool:        true,
 		},
 		"no matches": {
-			Strings:           []string{"car", "bus", "truck", "train", "boat"},
-			PredicateFunction: func(s string) bool { return len(s) > 5 },
+			input:             []string{"car", "bus", "truck", "train", "boat"},
+			predicateFunction: func(s string) bool { return len(s) > 5 },
 			ExpectBool:        false,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Any4s(c.Strings, c.PredicateFunction)
+			actual := Any4s(c.input, c.predicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("Any4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
+				t.Errorf("Any4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.ExpectBool)
 			}
 		})
 	}
@@ -69,32 +69,32 @@ func TestAny4s(t *testing.T) {
 // TestAll4s calls All4s to check for valid return values.
 func TestAll4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
+		input             []string
+		predicateFunction TestStringPredicateFunction1
 		ExpectBool        bool
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
 			ExpectBool:        false,
 		},
 		"all match": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 2 },
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 2 },
 			ExpectBool:        true,
 		},
 		"at least one not match": {
-			Strings:           []string{"car", "bus", "truck", "train", "boat"},
-			PredicateFunction: func(s string) bool { return len(s) > 4 },
+			input:             []string{"car", "bus", "truck", "train", "boat"},
+			predicateFunction: func(s string) bool { return len(s) > 4 },
 			ExpectBool:        false,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := All4s(c.Strings, c.PredicateFunction)
+			actual := All4s(c.input, c.predicateFunction)
 			if actual != c.ExpectBool {
-				t.Errorf("All4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectBool)
+				t.Errorf("All4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.ExpectBool)
 			}
 		})
 	}
@@ -103,27 +103,27 @@ func TestAll4s(t *testing.T) {
 // TestFilter4s calls Filter4s to check for valid return values.
 func TestFilter4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
+		input             []string
+		predicateFunction TestStringPredicateFunction1
 		ExpectStringArray []string
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
 			ExpectStringArray: []string{},
 		},
 		"at least one matches": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
 			ExpectStringArray: []string{"mouse", "bird", "fish"},
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Filter4s(c.Strings, c.PredicateFunction)
+			actual := Filter4s(c.input, c.predicateFunction)
 			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Filter4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray)
+				t.Errorf("Filter4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.ExpectStringArray)
 			}
 		})
 	}
@@ -132,22 +132,22 @@ func TestFilter4s(t *testing.T) {
 // TestMap4s calls Map4s to check for valid return values.
 func TestMap4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction2
+		input             []string
+		predicateFunction TestStringPredicateFunction2
 		ExpectStringArray []string
 	}{
 		"append to string": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) string { return s + "!" },
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) string { return s + "!" },
 			ExpectStringArray: []string{"dog!", "cat!", "mouse!", "bird!", "fish!"},
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Map4s(c.Strings, c.PredicateFunction)
+			actual := Map4s(c.input, c.predicateFunction)
 			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Map4s(%v, %v) = %v, want %v", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray)
+				t.Errorf("Map4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.ExpectStringArray)
 			}
 		})
 	}
