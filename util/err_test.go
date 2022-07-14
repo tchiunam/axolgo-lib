@@ -31,32 +31,32 @@ import (
 // checking for a valid return value.
 func TestErrorContains(t *testing.T) {
 	cases := map[string]struct {
-		Err        error
-		String     string
-		ExpectBool bool
+		err        error
+		match      string
+		expectBool bool
 	}{
 		"nil error": {
-			Err:        nil,
-			String:     "",
-			ExpectBool: false,
+			err:        nil,
+			match:      "",
+			expectBool: false,
 		},
 		"empty string": {
-			Err:        errors.New("It's a beautiful day for a walk in the park"),
-			String:     "",
-			ExpectBool: false,
+			err:        errors.New("It's a beautiful day for a walk in the park"),
+			match:      "",
+			expectBool: false,
 		},
 		"string in error": {
-			Err:        errors.New("It's a beautiful day for a walk in the park"),
-			String:     "beautiful",
-			ExpectBool: true,
+			err:        errors.New("It's a beautiful day for a walk in the park"),
+			match:      "beautiful",
+			expectBool: true,
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := ErrorContains(tc.Err, tc.String)
-			if actual != tc.ExpectBool {
-				t.Errorf("ErrorContains(%v, %v) = %v, want %v", tc.Err, tc.String, actual, tc.ExpectBool)
+			actual := ErrorContains(tc.err, tc.match)
+			if actual != tc.expectBool {
+				t.Errorf("ErrorContains(%v, %v) = %v, want %v", tc.err, tc.match, actual, tc.expectBool)
 			}
 		})
 	}

@@ -35,28 +35,28 @@ func TestExpandPath(t *testing.T) {
 	homeDir := usr.HomeDir
 
 	cases := map[string]struct {
-		Path       string
-		ExpectPath string
+		path       string
+		expectPath string
 	}{
 		"nil input": {
-			Path:       "",
-			ExpectPath: "",
+			path:       "",
+			expectPath: "",
 		},
 		"only tilde": {
-			Path:       "~",
-			ExpectPath: homeDir,
+			path:       "~",
+			expectPath: homeDir,
 		},
 		"tilde with path": {
-			Path:       "~/subdir/sub-subdir",
-			ExpectPath: fmt.Sprintf("%s/subdir/sub-subdir", homeDir),
+			path:       "~/subdir/sub-subdir",
+			expectPath: fmt.Sprintf("%s/subdir/sub-subdir", homeDir),
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			path := ExpandPath(c.Path)
-			if path != c.ExpectPath {
-				t.Errorf("ExpandPath(%q) = %q, want %q", c.Path, path, c.ExpectPath)
+			path := ExpandPath(c.path)
+			if path != c.expectPath {
+				t.Errorf("ExpandPath(%q) = %q, want %q", c.path, path, c.expectPath)
 			}
 		})
 	}
