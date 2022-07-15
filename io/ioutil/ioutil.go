@@ -35,6 +35,9 @@ func ReadIniFile(filepath string) (*ini.File, error) {
 // Read the file given by filepath as a YAML file. Viper instance
 // is returned if optClass is not provided. Otherwise Unmarshalling
 // will be performed and the object will be returned.
+// A Viper object will be returned if optClass is not provided.
+// If optClass is provided, Unmarshalling will be performed and
+// the class will be updated. No object will be returned.
 func ReadYamlFile(filepath string, optClass ...interface{}) (interface{}, error) {
 	v := viper.New()
 	v.SetConfigFile(filepath)
@@ -45,7 +48,6 @@ func ReadYamlFile(filepath string, optClass ...interface{}) (interface{}, error)
 	if optClass == nil {
 		return v, nil
 	} else {
-		err = v.Unmarshal(&optClass)
-		return optClass, err
+		return nil, v.Unmarshal(&optClass[0])
 	}
 }

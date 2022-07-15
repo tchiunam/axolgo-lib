@@ -2,7 +2,7 @@
 
 # axolgo-lib, the Axolotl Library in Golang
 [![Go](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml)
-[![Version](https://img.shields.io/badge/Version-v0.0.3-yellow.svg)](https://github.com/tchiunam/axolgo-lib/releases/tag/v0.0.3)
+[![Version](https://img.shields.io/badge/Version-v0.0.4-yellow.svg)](https://github.com/tchiunam/axolgo-lib/releases/tag/v0.0.4)
 [![codecov](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG)](https://codecov.io/gh/tchiunam/axolgo-lib)
 [![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
