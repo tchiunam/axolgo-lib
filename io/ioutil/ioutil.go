@@ -23,6 +23,8 @@ THE SOFTWARE.
 package ioutil
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 	"gopkg.in/ini.v1"
 )
@@ -39,6 +41,12 @@ func ReadIniFile(filepath string) (*ini.File, error) {
 // If optClass is provided, Unmarshalling will be performed and
 // the class will be updated. No object will be returned.
 func ReadYamlFile(filepath string, optClass ...interface{}) (interface{}, error) {
+	// return error if optClass is more than one element
+	if len(optClass) > 1 {
+		return nil, fmt.Errorf("optClass must be a single element")
+	}
+
+	// Read the file as YAML
 	v := viper.New()
 	v.SetConfigFile(filepath)
 	err := v.ReadInConfig()
@@ -48,6 +56,7 @@ func ReadYamlFile(filepath string, optClass ...interface{}) (interface{}, error)
 	if optClass == nil {
 		return v, nil
 	} else {
+		// Unmarshal the config into the class
 		return nil, v.Unmarshal(&optClass[0])
 	}
 }
