@@ -34,29 +34,81 @@ func ReadIniFile(filepath string) (*ini.File, error) {
 	return ini.Load(filepath)
 }
 
-// Read the file given by filepath as a YAML file. Viper instance
-// is returned if optClass is not provided. Otherwise Unmarshalling
-// will be performed and the object will be returned.
-// A Viper object will be returned if optClass is not provided.
+// Supported options for reading config files
+type ConfigFileOptions struct {
+	Type  string
+	Class interface{}
+}
+
+// ConfigFileOptionsFunc is a type alias for ConfigFileOptions functional option
+type ConfigFileOptionsFunc func(f *ConfigFileOptions) error
+
+// WithCFOType is a helper function to construct functional options
+// that sets config file type on config's ConfigFileOptions.
+func WithCFOType(fileType string) ConfigFileOptionsFunc {
+	return func(f *ConfigFileOptions) error {
+		f.Type = fileType
+		return nil
+	}
+}
+
+// WithCFOClass is a helper function to construct functional options
+// that sets class for unmarshalling on config's ConfigFileOptions.
+func WithCFOClass(class interface{}) ConfigFileOptionsFunc {
+	return func(f *ConfigFileOptions) error {
+		f.Class = class
+		return nil
+	}
+}
+
+// Read the file given by filepath. Viper instance is returned
+// if optClass is not provided. Otherwise Unmarshalling will be
+// performed.
 // If optClass is provided, Unmarshalling will be performed and
 // the class will be updated. No object will be returned.
-func ReadYamlFile(filepath string, optClass ...interface{}) (interface{}, error) {
-	// return error if optClass is more than one element
-	if len(optClass) > 1 {
-		return nil, fmt.Errorf("optClass must be a single element")
+// optClass is expected to be a pointer to a struct.
+//
+// For example:
+// 	type Config struct {
+// 		Name string
+// 	}
+// 	var config Config
+// 	err := ReadConfigFile("config.yaml", WithClass(&config))
+// 	if err != nil {
+//      doSomethingWithError(err)
+// 	}
+func ReadConfigFile(filepath string, optFns ...func(*ConfigFileOptions) error) (interface{}, error) {
+	options := ConfigFileOptions{}
+
+	for _, optFn := range optFns {
+		if err := optFn(&options); err != nil {
+			return nil, fmt.Errorf("Fail to configure ReadConfigFile options: %v", err)
+		}
 	}
 
-	// Read the file as YAML
+	// Read the file using Viper
 	v := viper.New()
 	v.SetConfigFile(filepath)
+	if options.Type != "" {
+		v.SetConfigType(options.Type)
+	}
 	err := v.ReadInConfig()
 	if err != nil {
 		return nil, err
 	}
-	if optClass == nil {
+	if options.Class == nil {
 		return v, nil
 	} else {
 		// Unmarshal the config into the class
-		return nil, v.Unmarshal(&optClass[0])
+		return nil, v.Unmarshal(&options.Class)
 	}
+}
+
+// Read the file given by filepath as a YAML file
+func ReadYamlFile(filepath string, optFns ...func(*ConfigFileOptions) error) (interface{}, error) {
+	// Add the last option to read the file as YAML
+	// which is the default behavior of ReadYAMLFile
+	optFns = append(optFns, WithCFOType("yaml"))
+
+	return ReadConfigFile(filepath, optFns...)
 }
