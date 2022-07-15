@@ -121,7 +121,8 @@ func TestReadYamlFile(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			var inventory TestReadYamlFileInvalidInventory
-			_, err := ReadYamlFile(tc.filepath, &inventory)
+			options := WithCFOClass(&inventory)
+			_, err := ReadYamlFile(tc.filepath, options)
 
 			if err != nil {
 				t.Errorf("Expected no error, got %s", err.Error())
