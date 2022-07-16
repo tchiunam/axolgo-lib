@@ -22,7 +22,10 @@ THE SOFTWARE.
 
 package types
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 // TestParameter calls Parameter to check for initialization
 func TestParameter(t *testing.T) {
@@ -58,26 +61,32 @@ func TestParameter(t *testing.T) {
 // TestStringArrayFlag calls StringArrayFlag to check for initialization
 func TestStringArrayFlag(t *testing.T) {
 	cases := map[string]struct {
-		flag  *StringArrayFlag
 		value []string
 	}{
 		"two values": {
-			flag:  &StringArrayFlag{"lion", "tiger"},
 			value: []string{"lion", "tiger"},
 		},
 		"four values": {
-			flag:  &StringArrayFlag{"lion", "tiger", "bear", "wolf"},
 			value: []string{"lion", "tiger", "bear", "wolf"},
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
+			// loop through the values and append them to the flag
+			flag := StringArrayFlag{}
+			for _, value := range tc.value {
+				flag.Set(value)
+			}
 			// loop through the value string array
-			for i, v := range *tc.flag {
+			for i, v := range flag {
 				if v != tc.value[i] {
 					t.Errorf("Expected value %s, got %s", tc.value[i], v)
 				}
+			}
+			// check the flag String() result
+			if flag.String() != fmt.Sprint(tc.value) {
+				t.Errorf("Expected value %s, got %s", fmt.Sprint(tc.value), flag.String())
 			}
 		})
 	}
