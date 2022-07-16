@@ -2,11 +2,11 @@
 
 # axolgo-lib, the Axolotl Library in Golang
 [![Go](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml)
-[![Version](https://img.shields.io/badge/Version-v0.0.3-yellow.svg)](https://github.com/tchiunam/axolgo-lib/releases/tag/v0.0.3)
+[![Version](https://img.shields.io/badge/Version-v0.0.4-yellow.svg)](https://github.com/tchiunam/axolgo-lib/releases/tag/v0.0.4)
 [![codecov](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG)](https://codecov.io/gh/tchiunam/axolgo-lib)
 [![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 

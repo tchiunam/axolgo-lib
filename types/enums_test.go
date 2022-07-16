@@ -29,20 +29,20 @@ import "testing"
 // return value.
 func TestAxolVarTemplateStringFieldWithKeyValueNew(t *testing.T) {
 	cases := map[string]struct {
-		Strings      []string
-		ExpectString string
+		input        []string
+		expectString string
 	}{
 		"non-nil input": {
-			Strings:      []string{"0RAV", "1RAV", "2RAV"},
-			ExpectString: "{{range $i, $v := .0RAV}}{{if $i}}, {{end}}{{`{`}}{{.1RAV}}: {{.2RAV}}{{`}`}}{{end}}",
+			input:        []string{"0RAV", "1RAV", "2RAV"},
+			expectString: "{{range $i, $v := .0RAV}}{{if $i}}, {{end}}{{`{`}}{{.1RAV}}: {{.2RAV}}{{`}`}}{{end}}",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			a := AxolVarTemplateStringFieldWithKeyValue.New(c.Strings...)
-			if a != c.ExpectString {
-				t.Errorf("Expected %s, got %s, case %q", c.ExpectString, a, name)
+			a := AxolVarTemplateStringFieldWithKeyValue.New(c.input...)
+			if a != c.expectString {
+				t.Errorf("Expected %s, got %s", c.expectString, a)
 			}
 		})
 	}

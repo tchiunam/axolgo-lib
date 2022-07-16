@@ -30,24 +30,24 @@ func TestHushedStringPtr(t *testing.T) {
 	testString := "something"
 
 	cases := map[string]struct {
-		StringPtr    *string
-		ExpectString string
+		input        *string
+		expectString string
 	}{
 		"nil input": {
-			StringPtr:    nil,
-			ExpectString: "",
+			input:        nil,
+			expectString: "",
 		},
 		"non-nil input": {
-			StringPtr:    &testString,
-			ExpectString: "something",
+			input:        &testString,
+			expectString: "something",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := HushedStringPtr(c.StringPtr)
-			if *actual != c.ExpectString {
-				t.Errorf("HushedStringPtr(%v) = %v, want %v, case %q", c.StringPtr, *actual, c.ExpectString, name)
+			actual := HushedStringPtr(c.input)
+			if *actual != c.expectString {
+				t.Errorf("HushedStringPtr(%v) = %v, want %v", c.input, *actual, c.expectString)
 			}
 		})
 	}

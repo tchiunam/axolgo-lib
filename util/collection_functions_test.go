@@ -35,32 +35,32 @@ type TestStringPredicateFunction2 func(string) string
 // TestAny4s calls Any4s to check for valid return values.
 func TestAny4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
-		ExpectBool        bool
+		input             []string
+		predicateFunction TestStringPredicateFunction1
+		expectBool        bool
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
-			ExpectBool:        false,
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
+			expectBool:        false,
 		},
 		"at least one matches": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
-			ExpectBool:        true,
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
+			expectBool:        true,
 		},
 		"no matches": {
-			Strings:           []string{"car", "bus", "truck", "train", "boat"},
-			PredicateFunction: func(s string) bool { return len(s) > 5 },
-			ExpectBool:        false,
+			input:             []string{"car", "bus", "truck", "train", "boat"},
+			predicateFunction: func(s string) bool { return len(s) > 5 },
+			expectBool:        false,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Any4s(c.Strings, c.PredicateFunction)
-			if actual != c.ExpectBool {
-				t.Errorf("Any4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
+			actual := Any4s(c.input, c.predicateFunction)
+			if actual != c.expectBool {
+				t.Errorf("Any4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
 			}
 		})
 	}
@@ -69,32 +69,32 @@ func TestAny4s(t *testing.T) {
 // TestAll4s calls All4s to check for valid return values.
 func TestAll4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
-		ExpectBool        bool
+		input             []string
+		predicateFunction TestStringPredicateFunction1
+		expectBool        bool
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
-			ExpectBool:        false,
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
+			expectBool:        false,
 		},
 		"all match": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 2 },
-			ExpectBool:        true,
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 2 },
+			expectBool:        true,
 		},
 		"at least one not match": {
-			Strings:           []string{"car", "bus", "truck", "train", "boat"},
-			PredicateFunction: func(s string) bool { return len(s) > 4 },
-			ExpectBool:        false,
+			input:             []string{"car", "bus", "truck", "train", "boat"},
+			predicateFunction: func(s string) bool { return len(s) > 4 },
+			expectBool:        false,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := All4s(c.Strings, c.PredicateFunction)
-			if actual != c.ExpectBool {
-				t.Errorf("All4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectBool, name)
+			actual := All4s(c.input, c.predicateFunction)
+			if actual != c.expectBool {
+				t.Errorf("All4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
 			}
 		})
 	}
@@ -103,27 +103,27 @@ func TestAll4s(t *testing.T) {
 // TestFilter4s calls Filter4s to check for valid return values.
 func TestFilter4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction1
-		ExpectStringArray []string
+		input             []string
+		predicateFunction TestStringPredicateFunction1
+		expectStringArray []string
 	}{
 		"empty strings without matching": {
-			Strings:           []string{},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
-			ExpectStringArray: []string{},
+			input:             []string{},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
+			expectStringArray: []string{},
 		},
 		"at least one matches": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) bool { return len(s) > 3 },
-			ExpectStringArray: []string{"mouse", "bird", "fish"},
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) bool { return len(s) > 3 },
+			expectStringArray: []string{"mouse", "bird", "fish"},
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Filter4s(c.Strings, c.PredicateFunction)
-			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Filter4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
+			actual := Filter4s(c.input, c.predicateFunction)
+			if !reflect.DeepEqual(actual, c.expectStringArray) {
+				t.Errorf("Filter4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectStringArray)
 			}
 		})
 	}
@@ -132,22 +132,22 @@ func TestFilter4s(t *testing.T) {
 // TestMap4s calls Map4s to check for valid return values.
 func TestMap4s(t *testing.T) {
 	cases := map[string]struct {
-		Strings           []string
-		PredicateFunction TestStringPredicateFunction2
-		ExpectStringArray []string
+		input             []string
+		predicateFunction TestStringPredicateFunction2
+		expectStrings     []string
 	}{
 		"append to string": {
-			Strings:           []string{"dog", "cat", "mouse", "bird", "fish"},
-			PredicateFunction: func(s string) string { return s + "!" },
-			ExpectStringArray: []string{"dog!", "cat!", "mouse!", "bird!", "fish!"},
+			input:             []string{"dog", "cat", "mouse", "bird", "fish"},
+			predicateFunction: func(s string) string { return s + "!" },
+			expectStrings:     []string{"dog!", "cat!", "mouse!", "bird!", "fish!"},
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			actual := Map4s(c.Strings, c.PredicateFunction)
-			if !reflect.DeepEqual(actual, c.ExpectStringArray) {
-				t.Errorf("Map4s(%v, %v) = %v, want %v, case %q", c.Strings, c.PredicateFunction, actual, c.ExpectStringArray, name)
+			actual := Map4s(c.input, c.predicateFunction)
+			if !reflect.DeepEqual(actual, c.expectStrings) {
+				t.Errorf("Map4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectStrings)
 			}
 		})
 	}
