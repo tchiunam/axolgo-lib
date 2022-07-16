@@ -23,8 +23,11 @@ THE SOFTWARE.
 package ioutil
 
 import (
+	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestReadIniFile calls ReadIniFile to check for reading
@@ -76,6 +79,58 @@ func TestReadIniFileInvalid(t *testing.T) {
 			if !strings.Contains(err.Error(), tc.expectStringInError) {
 				t.Errorf("Expected error containing %s, got %s", tc.expectStringInError, err.Error())
 			}
+		})
+	}
+}
+
+// TestReadConfigFile calls ReadConfigFile to check
+// for reading of config file.
+func TestReadConfigFile(t *testing.T) {
+	cases := map[string]struct {
+		filepath string
+	}{
+		"valid file": {
+			filepath: "./testdata/ioutil_test.yaml",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			v, err := ReadConfigFile(tc.filepath)
+			assert.NoError(t, err)
+			assert.NotNil(t, v)
+		})
+	}
+}
+
+func MockWithErrorConfigFileOption(whatever string) ConfigFileOptionsFunc {
+	return func(f *ConfigFileOptions) error {
+		return fmt.Errorf("throw error")
+	}
+}
+
+// TestReadConfigFileInvalid calls ReadConfigFile to check
+// for error cases when ConfigFileOptions cannot be loaded.
+func TestReadConfigFileInvalid(t *testing.T) {
+	cases := map[string]struct {
+		filepath    string
+		expectError string
+	}{
+		"valid file": {
+			filepath:    "./testdata/ioutil_test.yaml",
+			expectError: "throw error",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := ReadConfigFile(tc.filepath, MockWithErrorConfigFileOption("whatever"))
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectError,
+				"Expected error containing %s, got %s", tc.expectError, err.Error())
 		})
 	}
 }
