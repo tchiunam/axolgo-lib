@@ -10,6 +10,8 @@
 [![Sourcegraph](https://sourcegraph.com/github.com/tchiunam/axolgo-lib/-/badge.svg)](https://sourcegraph.com/github.com/tchiunam/axolgo-lib?badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/tchiunam/axolgo-lib)](https://github.com/tchiunam/axolgo-lib)
+[![Repository Size](https://img.shields.io/github/repo-size/tchiunam/axolgo-lib.svg?label=Repo%20size)](https://github.com/tchiunam/axolgo-lib)
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
