@@ -25,6 +25,8 @@ package types
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestParameter calls Parameter to check for initialization
@@ -48,12 +50,8 @@ func TestParameter(t *testing.T) {
 			// initialize the parameter
 			param := Parameter{Name: tc.name, Value: tc.value}
 			// check the name and value
-			if *param.Name != *tc.name {
-				t.Errorf("Expected name %s, got %s", *tc.name, *param.Name)
-			}
-			if *param.Value != *tc.value {
-				t.Errorf("Expected value %s, got %s", *tc.value, *param.Value)
-			}
+			assert.Equal(t, *tc.name, *param.Name, "Expected name %s, got %s", *tc.name, *param.Name)
+			assert.Equal(t, *tc.value, *param.Value, "Expected value %s, got %s", *tc.value, *param.Value)
 		})
 	}
 }
@@ -80,14 +78,14 @@ func TestStringArrayFlag(t *testing.T) {
 			}
 			// loop through the value string array
 			for i, v := range flag {
-				if v != tc.value[i] {
-					t.Errorf("Expected value %s, got %s", tc.value[i], v)
-				}
+				assert.Equal(t, tc.value[i], v, "Expected value %s, got %s", tc.value[i], v)
 			}
 			// check the flag String() result
-			if flag.String() != fmt.Sprint(tc.value) {
-				t.Errorf("Expected value %s, got %s", fmt.Sprint(tc.value), flag.String())
-			}
+			assert.Equal(
+				t,
+				fmt.Sprintf("%v", tc.value),
+				flag.String(),
+				"Expected value %s, got %s", fmt.Sprintf("%v", tc.value), flag.String())
 		})
 	}
 }

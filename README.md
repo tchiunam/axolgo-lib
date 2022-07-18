@@ -2,11 +2,16 @@
 
 # axolgo-lib, the Axolotl Library in Golang
 [![Go](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml)
-[![Version](https://img.shields.io/badge/Version-v0.0.4-yellow.svg)](https://github.com/tchiunam/axolgo-lib/releases/tag/v0.0.4)
+[![Version](https://img.shields.io/github/v/release/tchiunam/axolgo-lib?sort=semver)](https://github.com/tchiunam/axolgo-lib/releases)
 [![codecov](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG)](https://codecov.io/gh/tchiunam/axolgo-lib)
 [![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tchiunam/axolgo-lib)](https://goreportcard.com/report/github.com/tchiunam/axolgo-lib)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/tchiunam/axolgo-lib)](https://pkg.go.dev/github.com/tchiunam/axolgo-lib)
+[![Sourcegraph](https://sourcegraph.com/github.com/tchiunam/axolgo-lib/-/badge.svg)](https://sourcegraph.com/github.com/tchiunam/axolgo-lib?badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/tchiunam/axolgo-lib)](https://github.com/tchiunam/axolgo-lib)
+[![Repository Size](https://img.shields.io/github/repo-size/tchiunam/axolgo-lib.svg?label=Repo%20size)](https://github.com/tchiunam/axolgo-lib)
 
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 

@@ -22,7 +22,11 @@ THE SOFTWARE.
 
 package util
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 // TestHushedStringPtr calls HushedStringPtr with a string,
 // checking for a valid return value.
@@ -46,9 +50,7 @@ func TestHushedStringPtr(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			actual := HushedStringPtr(c.input)
-			if *actual != c.expectString {
-				t.Errorf("HushedStringPtr(%v) = %v, want %v", c.input, *actual, c.expectString)
-			}
+			assert.Equal(t, c.expectString, *actual, "HushedStringPtr(%v) = %v, want %v", c.input, actual, c.expectString)
 		})
 	}
 }

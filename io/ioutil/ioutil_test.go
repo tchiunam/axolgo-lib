@@ -23,8 +23,10 @@ THE SOFTWARE.
 package ioutil
 
 import (
-	"strings"
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestReadIniFile calls ReadIniFile to check for reading
@@ -43,13 +45,15 @@ func TestReadIniFile(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			file, err := ReadIniFile(tc.filepath)
-			if err != nil {
-				t.Errorf("Expected no error, got %s", err.Error())
-			}
+			assert.NoError(t, err, "Expected no error, got %s", err)
+
 			for _, sectionName := range tc.expectSectionNames {
-				if section := file.Section(sectionName); section.Name() != sectionName {
-					t.Errorf("Expected section name %s, got %s", sectionName, section.Name())
-				}
+				section := file.Section(sectionName)
+				assert.Equal(
+					t,
+					sectionName,
+					section.Name(),
+					"Expected section name %s, got %s", sectionName, section.Name())
 			}
 		})
 	}
@@ -70,12 +74,64 @@ func TestReadIniFileInvalid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := ReadIniFile(tc.filepath)
-			if err == nil {
-				t.Errorf("Expected error, got nil")
-			}
-			if !strings.Contains(err.Error(), tc.expectStringInError) {
-				t.Errorf("Expected error containing %s, got %s", tc.expectStringInError, err.Error())
-			}
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectStringInError,
+				"Expected error containing %s, got %s", tc.expectStringInError, err.Error())
+		})
+	}
+}
+
+// TestReadConfigFile calls ReadConfigFile to check
+// for reading of config file.
+func TestReadConfigFile(t *testing.T) {
+	cases := map[string]struct {
+		filepath string
+	}{
+		"valid file": {
+			filepath: "./testdata/ioutil_test.yaml",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			v, err := ReadConfigFile(tc.filepath)
+			assert.NoError(t, err)
+			assert.NotNil(t, v)
+		})
+	}
+}
+
+func MockWithErrorConfigFileOption(whatever string) ConfigFileOptionsFunc {
+	return func(f *ConfigFileOptions) error {
+		return fmt.Errorf("throw error")
+	}
+}
+
+// TestReadConfigFileInvalid calls ReadConfigFile to check
+// for error cases when ConfigFileOptions cannot be loaded.
+func TestReadConfigFileInvalid(t *testing.T) {
+	cases := map[string]struct {
+		filepath    string
+		expectError string
+	}{
+		"valid file": {
+			filepath:    "./testdata/ioutil_test.yaml",
+			expectError: "throw error",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := ReadConfigFile(tc.filepath, MockWithErrorConfigFileOption("whatever"))
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectError,
+				"Expected error containing %s, got %s", tc.expectError, err.Error())
 		})
 	}
 }
@@ -124,15 +180,17 @@ func TestReadYamlFile(t *testing.T) {
 			options := WithCFOClass(&inventory)
 			_, err := ReadYamlFile(tc.filepath, options)
 
-			if err != nil {
-				t.Errorf("Expected no error, got %s", err.Error())
-			}
-			if inventory.Book.Title != tc.expect.Book.Title {
-				t.Errorf("Expected title %s, got %s", tc.expect.Book.Title, inventory.Book.Title)
-			}
-			if inventory.Book.Author.Name != tc.expect.Book.Author.Name {
-				t.Errorf("Expected author name %s, got %s", tc.expect.Book.Author.Name, inventory.Book.Author.Name)
-			}
+			assert.NoError(t, err, "Expected no error, got %s", err)
+			assert.Equal(
+				t,
+				tc.expect.Book.Title,
+				inventory.Book.Title,
+				"Expected title %s, got %s", tc.expect.Book.Title, inventory.Book.Title)
+			assert.Equal(
+				t,
+				tc.expect.Book.Author.Name,
+				inventory.Book.Author.Name,
+				"Expected author name %s, got %s", tc.expect.Book.Author.Name, inventory.Book.Author.Name)
 		})
 	}
 }
@@ -152,12 +210,12 @@ func TestReadYamlFileInvalid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := ReadYamlFile(tc.filepath)
-			if err == nil {
-				t.Errorf("Expected error, got nil")
-			}
-			if !strings.Contains(err.Error(), tc.expectStringInError) {
-				t.Errorf("Expected error containing %s, got %s", tc.expectStringInError, err.Error())
-			}
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectStringInError,
+				"Expected error containing %s, got %s", tc.expectStringInError, err.Error())
 		})
 	}
 }
