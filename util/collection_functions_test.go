@@ -25,6 +25,8 @@ package util
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Predicate function type for testing predicate function
@@ -59,9 +61,7 @@ func TestAny4s(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			actual := Any4s(c.input, c.predicateFunction)
-			if actual != c.expectBool {
-				t.Errorf("Any4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
-			}
+			assert.Equal(t, c.expectBool, actual, "Any4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
 		})
 	}
 }
@@ -93,9 +93,7 @@ func TestAll4s(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			actual := All4s(c.input, c.predicateFunction)
-			if actual != c.expectBool {
-				t.Errorf("All4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
-			}
+			assert.Equal(t, c.expectBool, actual, "All4s(%v, %v) = %v, want %v", c.input, c.predicateFunction, actual, c.expectBool)
 		})
 	}
 }

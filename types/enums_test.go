@@ -22,7 +22,11 @@ THE SOFTWARE.
 
 package types
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 // TestAxolVarTemplateStringFieldWithKeyValue calls the New function
 // of AxolVarTemplateStringFieldWithKeyValue, checking for a valid
@@ -41,9 +45,7 @@ func TestAxolVarTemplateStringFieldWithKeyValueNew(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			a := AxolVarTemplateStringFieldWithKeyValue.New(c.input...)
-			if a != c.expectString {
-				t.Errorf("Expected %s, got %s", c.expectString, a)
-			}
+			assert.Equal(t, c.expectString, a, "Expected %s, got %s", c.expectString, a)
 		})
 	}
 }

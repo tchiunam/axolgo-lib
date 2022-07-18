@@ -26,6 +26,8 @@ import (
 	"fmt"
 	"os/user"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestExpandPath calls ExpandPath with a string,
@@ -55,9 +57,7 @@ func TestExpandPath(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			path := ExpandPath(c.path)
-			if path != c.expectPath {
-				t.Errorf("ExpandPath(%q) = %q, want %q", c.path, path, c.expectPath)
-			}
+			assert.Equal(t, c.expectPath, path, "ExpandPath(%v) = %v, want %v", c.path, path, c.expectPath)
 		})
 	}
 }

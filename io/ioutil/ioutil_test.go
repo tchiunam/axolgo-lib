@@ -24,7 +24,6 @@ package ioutil
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,13 +45,15 @@ func TestReadIniFile(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			file, err := ReadIniFile(tc.filepath)
-			if err != nil {
-				t.Errorf("Expected no error, got %s", err.Error())
-			}
+			assert.NoError(t, err, "Expected no error, got %s", err)
+
 			for _, sectionName := range tc.expectSectionNames {
-				if section := file.Section(sectionName); section.Name() != sectionName {
-					t.Errorf("Expected section name %s, got %s", sectionName, section.Name())
-				}
+				section := file.Section(sectionName)
+				assert.Equal(
+					t,
+					sectionName,
+					section.Name(),
+					"Expected section name %s, got %s", sectionName, section.Name())
 			}
 		})
 	}
@@ -73,12 +74,12 @@ func TestReadIniFileInvalid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := ReadIniFile(tc.filepath)
-			if err == nil {
-				t.Errorf("Expected error, got nil")
-			}
-			if !strings.Contains(err.Error(), tc.expectStringInError) {
-				t.Errorf("Expected error containing %s, got %s", tc.expectStringInError, err.Error())
-			}
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectStringInError,
+				"Expected error containing %s, got %s", tc.expectStringInError, err.Error())
 		})
 	}
 }
@@ -179,15 +180,17 @@ func TestReadYamlFile(t *testing.T) {
 			options := WithCFOClass(&inventory)
 			_, err := ReadYamlFile(tc.filepath, options)
 
-			if err != nil {
-				t.Errorf("Expected no error, got %s", err.Error())
-			}
-			if inventory.Book.Title != tc.expect.Book.Title {
-				t.Errorf("Expected title %s, got %s", tc.expect.Book.Title, inventory.Book.Title)
-			}
-			if inventory.Book.Author.Name != tc.expect.Book.Author.Name {
-				t.Errorf("Expected author name %s, got %s", tc.expect.Book.Author.Name, inventory.Book.Author.Name)
-			}
+			assert.NoError(t, err, "Expected no error, got %s", err)
+			assert.Equal(
+				t,
+				tc.expect.Book.Title,
+				inventory.Book.Title,
+				"Expected title %s, got %s", tc.expect.Book.Title, inventory.Book.Title)
+			assert.Equal(
+				t,
+				tc.expect.Book.Author.Name,
+				inventory.Book.Author.Name,
+				"Expected author name %s, got %s", tc.expect.Book.Author.Name, inventory.Book.Author.Name)
 		})
 	}
 }
@@ -207,12 +210,12 @@ func TestReadYamlFileInvalid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := ReadYamlFile(tc.filepath)
-			if err == nil {
-				t.Errorf("Expected error, got nil")
-			}
-			if !strings.Contains(err.Error(), tc.expectStringInError) {
-				t.Errorf("Expected error containing %s, got %s", tc.expectStringInError, err.Error())
-			}
+			assert.Error(t, err, "Expected error, got nil")
+			assert.ErrorContains(
+				t,
+				err,
+				tc.expectStringInError,
+				"Expected error containing %s, got %s", tc.expectStringInError, err.Error())
 		})
 	}
 }
