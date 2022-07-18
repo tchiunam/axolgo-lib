@@ -50,8 +50,8 @@ func TestParameter(t *testing.T) {
 			// initialize the parameter
 			param := Parameter{Name: tc.name, Value: tc.value}
 			// check the name and value
-			assert.Equal(t, *tc.name, param.Name, "Expected name %s, got %s", *tc.name, param.Name)
-			assert.Equal(t, *tc.value, param.Value, "Expected value %s, got %s", *tc.value, param.Value)
+			assert.Equal(t, *tc.name, *param.Name, "Expected name %s, got %s", *tc.name, *param.Name)
+			assert.Equal(t, *tc.value, *param.Value, "Expected value %s, got %s", *tc.value, *param.Value)
 		})
 	}
 }
