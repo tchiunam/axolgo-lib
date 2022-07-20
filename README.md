@@ -1,18 +1,72 @@
 <img src="images/axolgo-logo-transparent.png" width="50%" />
 
 # axolgo-lib, the Axolotl Library in Golang
-[![Go](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml)
-[![Version](https://img.shields.io/github/v/release/tchiunam/axolgo-lib?sort=semver)](https://github.com/tchiunam/axolgo-lib/releases)
-[![codecov](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG)](https://codecov.io/gh/tchiunam/axolgo-lib)
-[![CodeQL](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tchiunam/axolgo-lib)](https://goreportcard.com/report/github.com/tchiunam/axolgo-lib)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/tchiunam/axolgo-lib)](https://pkg.go.dev/github.com/tchiunam/axolgo-lib)
-[![Sourcegraph](https://sourcegraph.com/github.com/tchiunam/axolgo-lib/-/badge.svg)](https://sourcegraph.com/github.com/tchiunam/axolgo-lib?badge)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield)](https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/tchiunam/axolgo-lib)](https://github.com/tchiunam/axolgo-lib)
-[![Repository Size](https://img.shields.io/github/repo-size/tchiunam/axolgo-lib.svg?label=Repo%20size)](https://github.com/tchiunam/axolgo-lib)
+#### Release
+<div align="left">
+  <a href="https://github.com/tchiunam/axolgo-lib/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/tchiunam/axolgo-lib?sort=semver" />
+  </a>
+  <a href="https://github.com/tchiunam/axolgo-lib/releases">
+    <img alt="Release Date" src="https://img.shields.io/github/release-date/tchiunam/axolgo-lib" />
+  </a>
+  <a href="https://pkg.go.dev/github.com/tchiunam/axolgo-lib">
+    <img alt="PkgGoDev" src="https://pkg.go.dev/badge/github.com/tchiunam/axolgo-lib" />
+  </a>
+  <img alt="Go Version" src="https://img.shields.io/github/go-mod/go-version/tchiunam/axolgo-lib" />
+  <img alt="Language" src="https://img.shields.io/github/languages/count/tchiunam/axolgo-lib" />
+  <img alt="File Count" src="https://img.shields.io/github/directory-file-count/tchiunam/axolgo-lib" />
+  <img alt="Repository Size" src="https://img.shields.io/github/repo-size/tchiunam/axolgo-lib.svg?label=Repo%20size" />
+</div>
 
+#### Code Quality
+<div align="left">
+  <a href="https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml">
+    <img alt="Go" src="https://github.com/tchiunam/axolgo-lib/actions/workflows/go.yml/badge.svg" />
+  </a>
+  <a href="https://codecov.io/gh/tchiunam/axolgo-lib">
+    <img alt="codecov" src="https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graph/badge.svg?token=B5DNGRMYUG" />
+  </a>
+  <a href="https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml">
+    <img alt="CodeQL" src="https://github.com/tchiunam/axolgo-lib/actions/workflows/codeql-analysis.yml/badge.svg" />
+  </a>
+  <a href="https://goreportcard.com/report/github.com/tchiunam/axolgo-lib">
+    <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/tchiunam/axolgo-lib" />
+  </a>
+</div>
+
+#### Activity
+<div align="left">
+  <a href="https://github.com/tchiunam/axolgo-lib/commits/main">
+    <img alt="Last Commit" src="https://img.shields.io/github/last-commit/tchiunam/axolgo-lib" />
+  </a>
+  <a href="https://github.com/tchiunam/axolgo-lib/issues?q=is%3Aissue+is%3Aclosed">
+    <img alt="Closed Issues" src="https://img.shields.io/github/issues-closed/tchiunam/axolgo-lib" />
+  </a>
+  <a href="https://github.com/tchiunam/axolgo-lib/pulls?q=is%3Apr+is%3Aclosed">
+    <img alt="Closed Pull Requests" src="https://img.shields.io/github/issues-pr-closed/tchiunam/axolgo-lib" />
+  </a>
+</div>
+
+#### License
+<div align="left">
+  <a href="https://opensource.org/licenses/MIT">
+    <img alt="License: MIT" src="https://img.shields.io/github/license/tchiunam/axolgo-lib" />
+  </a>
+  <a href="https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_shield">
+    <img alt="FOSSA Status" src="https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=shield" />
+  </a>
+</div>
+
+#### Popularity
+<div align="left">
+  <a href="https://sourcegraph.com/github.com/tchiunam/axolgo-lib?badge">
+    <img alt="Sourcegraph" src="https://sourcegraph.com/github.com/tchiunam/axolgo-lib/-/badge.svg" />
+  </a>
+  <img alt="Repo Stars" src="https://img.shields.io/github/stars/tchiunam/axolgo-lib?style=social" />
+  <img alt="Watchers" src="https://img.shields.io/github/watchers/tchiunam/axolgo-lib?style=social" />
+</div>
+
+<br />
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
 Go package: https://pkg.go.dev/github.com/tchiunam/axolgo-lib
