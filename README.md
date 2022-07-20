@@ -55,6 +55,5 @@ go test -coverpkg=./... ./...
 1. [axolgo-cloud](https://github.com/tchiunam/axolgo-cloud) for using cloud library (AWS SDK and GCP API)
 2. [axolgo-cli](https://github.com/tchiunam/axolgo-cli) for using Axolgo in command line
 
-
 ## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib.svg?type=large)](https://app.fossa.com/projects/custom%2B32310%2Fgithub.com%2Ftchiunam%2Faxolgo-lib?ref=badge_large)
