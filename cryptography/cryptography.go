@@ -28,8 +28,28 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"io"
+	"io/ioutil"
 )
+
+// CryptographyOptionsFunc is a type alias for CryptographyOptions functional option
+type CryptographyOptionsFunc func(*CryptographyOptions) error
+
+// CryptographyOptions are discrete set of options that are valid for loading the
+// configuration that is used to encrypt/decrypt files.
+type CryptographyOptions struct {
+	OutputFilename string
+}
+
+// WithOutputFilename is a helper function to construct functional options
+// that sets the output filename for the encrypted/decrypted file.
+func WithOutputFilename(v string) CryptographyOptionsFunc {
+	return func(o *CryptographyOptions) error {
+		o.OutputFilename = v
+		return nil
+	}
+}
 
 // Create a hash from a string
 func CreateHash(input string) string {
@@ -73,4 +93,47 @@ func Decrypt(data []byte, passphrase string) ([]byte, error) {
 		panic(err.Error())
 	}
 	return plaintext, nil
+}
+
+// Encrypt a file with a passphrase. Returns an error if any.
+// filename is the path to the file to be encrypted.
+// passphrase is the passphrase to use to encrypt the file.
+func EncryptFile(filename string, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	return _cryptFile(Encrypt, filename, passphrase, optFns...)
+}
+
+// Decrypt a file with a passphrase. Returns an error if any.
+// filename is the path to the file to be decrypted.
+// passphrase is the passphrase to use to decrypt the file.
+func DecryptFile(filename string, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	return _cryptFile(Decrypt, filename, passphrase, optFns...)
+}
+
+// fn is the function to be used to crypt/decrypt the file.
+func _cryptFile(
+	fn func([]byte, string) ([]byte, error),
+	filename string,
+	passphrase string,
+	optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	var options CryptographyOptions
+	for _, optFn := range optFns {
+		if err := optFn(&options); err != nil {
+			return nil, fmt.Errorf("Fail to read cryptography options: %v", err)
+		}
+	}
+
+	if content, err := ioutil.ReadFile(filename); err == nil {
+		if data, err := fn(content, passphrase); err == nil {
+			if options.OutputFilename != "" {
+				if err = ioutil.WriteFile(options.OutputFilename, data, 0644); err != nil {
+					return nil, err
+				}
+			}
+			return data, nil
+		} else {
+			return nil, err
+		}
+	} else {
+		return nil, err
+	}
 }

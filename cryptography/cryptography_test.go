@@ -23,6 +23,9 @@ THE SOFTWARE.
 package cryptography
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,7 +47,6 @@ func TestCreateHash(t *testing.T) {
 		},
 	}
 
-	// test all cases
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			actual := CreateHash(c.input)
@@ -102,5 +104,93 @@ func TestDecryptInvalid(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			assert.Panics(t, func() { Decrypt(c.data, c.passphrase) }, "Decrypt(%x, %v), want panic, %v", c.data, c.passphrase)
 		})
+	}
+}
+
+// Clean up the test files
+func _cleanTestEncryptDecryptFile(
+	encOutputFilename string,
+	decOutputFilename string) {
+	// Delete the encrypted file if it exists
+	if _, err := os.Stat(encOutputFilename); err == nil {
+		os.Remove(encOutputFilename)
+	}
+	// Delete the decrypted file if it exists
+	if _, err := os.Stat(decOutputFilename); err == nil {
+		os.Remove(decOutputFilename)
+	}
+}
+
+// TestEncryptDecryptFile tests the EncryptFile and DecryptFile functions
+func TestEncryptDecryptFile(t *testing.T) {
+	cases := map[string]struct {
+		filename          string
+		encFilename       string
+		encOutputFilename string
+		decOutputFilename string
+		passphrase        string
+		optFns            func(*CryptographyOptions) error
+	}{
+		"normal input": {
+			filename:          filepath.Join("testdata", "story.txt"),
+			encOutputFilename: filepath.Join("testdata", "story.txt.enc"),
+			decOutputFilename: filepath.Join("testdata", "story.txt.dec"),
+			passphrase:        "iamthebest",
+		},
+	}
+
+	for name, c := range cases {
+		_cleanTestEncryptDecryptFile(c.encOutputFilename, c.decOutputFilename)
+		t.Run(name, func(t *testing.T) {
+			_, err := EncryptFile(c.filename, c.passphrase, WithOutputFilename(c.encOutputFilename))
+			assert.Nil(t, err, "EncryptFile(%v, %v, %v) = %v, want nil", c.filename, c.passphrase, c.encOutputFilename, err)
+			_, err = DecryptFile(c.encOutputFilename, c.passphrase, WithOutputFilename(c.decOutputFilename))
+			assert.Nil(t, err, "DecryptFile(%v, %v, %v) = %v, want nil", c.encFilename, c.passphrase, c.decOutputFilename, err)
+		})
+	}
+}
+
+// MockWithCryptographyOptionsError is a mock implementation of CryptographyOptions
+// that can be used for testing error.
+func MockWithCryptographyOptionsError(v string) CryptographyOptionsFunc {
+	return func(o *CryptographyOptions) error {
+		o.OutputFilename = v
+		return fmt.Errorf("mock error")
+	}
+}
+
+func TestEncryptDecryptFileInvalid(t *testing.T) {
+	cases := map[string]struct {
+		filename          string
+		encFilename       string
+		encOutputFilename string
+		decOutputFilename string
+		passphrase        string
+		optFns            func(*CryptographyOptions) error
+	}{
+		"invalid option": {
+			optFns:            MockWithCryptographyOptionsError("foo.txt"),
+			filename:          filepath.Join("testdata", "story.txt"),
+			encOutputFilename: filepath.Join("testdata", "story.txt.enc"),
+			decOutputFilename: filepath.Join("testdata", "story.txt.dec"),
+			passphrase:        "iamthebest",
+		},
+		"file not exists": {
+			optFns:            WithOutputFilename("foo.txt"),
+			filename:          filepath.Join("testdata", "bar.txt"),
+			encOutputFilename: filepath.Join("testdata", "story.txt.enc"),
+			decOutputFilename: filepath.Join("testdata", "story.txt.dec"),
+			passphrase:        "iamthebest",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := EncryptFile(c.filename, c.passphrase, c.optFns)
+			assert.Error(t, err, "EncryptFile(%v, %v) = %v, want error", c.filename, c.passphrase, err)
+			_, err = DecryptFile(c.encOutputFilename, c.passphrase, c.optFns)
+			assert.Error(t, err, "DecryptFile(%v, %v) = %v, want error", c.encOutputFilename, c.passphrase, err)
+		})
+		_cleanTestEncryptDecryptFile(c.encOutputFilename, c.decOutputFilename)
 	}
 }
