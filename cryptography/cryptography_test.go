@@ -55,12 +55,20 @@ func TestCreateHash(t *testing.T) {
 	}
 }
 
+// MockWithCryptographyOptionsError is a mock implementation of CryptographyOptions
+// that can be used for testing error.
+func MockWithCryptographyOptionsError(v string) CryptographyOptionsFunc {
+	return func(o *CryptographyOptions) error {
+		o.OutputFilename = v
+		return fmt.Errorf("mock error")
+	}
+}
+
 // TestEncryptDecrypt tests the Encrypt and Decrypt functions
 func TestEncryptDecrypt(t *testing.T) {
 	cases := map[string]struct {
-		data         []byte
-		passphrase   string
-		expectString string
+		data       []byte
+		passphrase string
 	}{
 		"normal input": {
 			data:       []byte("The quick brown fox jumps over the lazy dog"),
@@ -79,16 +87,44 @@ func TestEncryptDecrypt(t *testing.T) {
 			actualDecrypt, err := Decrypt(actualEncrypt, c.passphrase)
 			assert.Nil(t, err, "Decrypt(%x, %v) = %v, want nil", actualEncrypt, c.passphrase, err)
 			assert.Equal(t, c.data, actualDecrypt, "Decrypt(%v, %v) = %v, want %v", actualEncrypt, c.passphrase, actualDecrypt, c.data)
+
+			// Test with cryptography options
+			_, err = Encrypt(c.data, c.passphrase, WithCustomHashFunc(CreateHash))
+			assert.Nil(t, err, "Encrypt(%x, %v) = %v, want nil", c.data, c.passphrase, err)
 		})
 	}
 }
 
-// TestEncryptDecryptInvalid call Decrypt with an invalid data
-func TestDecryptInvalid(t *testing.T) {
+// TestEncryptDecryptInvalid tests the Encrypt and Decrypt functions with invalid input
+func TestEncryptDecryptInvalid(t *testing.T) {
 	cases := map[string]struct {
-		data         []byte
-		passphrase   string
-		expectString string
+		optFns     func(*CryptographyOptions) error
+		data       []byte
+		passphrase string
+	}{
+		"normal input": {
+			data:       []byte("The quick brown fox jumps over the lazy dog"),
+			passphrase: "iamthebest",
+			optFns:     MockWithCryptographyOptionsError("foo.txt"),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := Encrypt(c.data, c.passphrase, c.optFns)
+			assert.Error(t, err, "Encrypt(%x, %v) = %v, want error", c.data, c.passphrase, err)
+			_, err = Decrypt(c.data, c.passphrase, c.optFns)
+			assert.Error(t, err, "Decrypt(%x, %v) = %v, want error", c.data, c.passphrase, err)
+		})
+	}
+}
+
+// TestDecryptPanic calls Decrypt and checks the panic
+func TestDecryptPanic(t *testing.T) {
+	cases := map[string]struct {
+		optFns     func(*CryptographyOptions) error
+		data       []byte
+		passphrase string
 	}{
 		"nil data": {
 			data:       nil,
@@ -103,6 +139,38 @@ func TestDecryptInvalid(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			assert.Panics(t, func() { Decrypt(c.data, c.passphrase) }, "Decrypt(%x, %v), want panic, %v", c.data, c.passphrase)
+		})
+	}
+}
+
+func MockHashFuncWithError(input string) string {
+	myarr := [1]string{"foo"}
+	index := 2
+
+	// This is a hack to get around the fact that the compiler doesn't know that
+	// the array is of length 1.
+	return myarr[index]
+}
+
+func TestEncryptDecryptWithHashInvalid(t *testing.T) {
+	cases := map[string]struct {
+		data       []byte
+		passphrase string
+		hashFunc   PassphraseHashFunc
+	}{
+		"nil data": {
+			data:       []byte("The quick brown fox jumps over the lazy dog"),
+			passphrase: "iamthebest",
+			hashFunc:   MockHashFuncWithError,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			assert.Panics(
+				t,
+				func() { Encrypt(c.data, c.passphrase, WithCustomHashFunc(c.hashFunc)) },
+				"Decrypt(%x, %v, %v), want panic, %v", c.data, c.passphrase, c.hashFunc)
 		})
 	}
 }
@@ -147,49 +215,66 @@ func TestEncryptDecryptFile(t *testing.T) {
 			_, err = DecryptFile(c.encOutputFilename, c.passphrase, WithOutputFilename(c.decOutputFilename))
 			assert.Nil(t, err, "DecryptFile(%v, %v, %v) = %v, want nil", c.encFilename, c.passphrase, c.decOutputFilename, err)
 		})
-	}
-}
-
-// MockWithCryptographyOptionsError is a mock implementation of CryptographyOptions
-// that can be used for testing error.
-func MockWithCryptographyOptionsError(v string) CryptographyOptionsFunc {
-	return func(o *CryptographyOptions) error {
-		o.OutputFilename = v
-		return fmt.Errorf("mock error")
+		_cleanTestEncryptDecryptFile(c.encOutputFilename, c.decOutputFilename)
 	}
 }
 
 func TestEncryptDecryptFileInvalid(t *testing.T) {
 	cases := map[string]struct {
-		filename          string
-		encFilename       string
-		encOutputFilename string
-		decOutputFilename string
-		passphrase        string
-		optFns            func(*CryptographyOptions) error
+		filename             string
+		encFilename          string
+		encOutputFilename    string
+		decOutputFilename    string
+		passphrase           string
+		optFn                func(string) CryptographyOptionsFunc
+		expectEncErrorString string
+		expectDecErrorString string
 	}{
 		"invalid option": {
-			optFns:            MockWithCryptographyOptionsError("foo.txt"),
-			filename:          filepath.Join("testdata", "story.txt"),
-			encOutputFilename: filepath.Join("testdata", "story.txt.enc"),
-			decOutputFilename: filepath.Join("testdata", "story.txt.dec"),
-			passphrase:        "iamthebest",
+			filename:             filepath.Join("testdata", "story.txt"),
+			encOutputFilename:    filepath.Join("testdata", "foo.txt"),
+			decOutputFilename:    filepath.Join("testdata", "foo.txt"),
+			passphrase:           "iamthebest",
+			optFn:                MockWithCryptographyOptionsError,
+			expectEncErrorString: "Fail to read cryptography options: mock error",
+			expectDecErrorString: "Fail to read cryptography options: mock error",
 		},
-		"file not exists": {
-			optFns:            WithOutputFilename("foo.txt"),
-			filename:          filepath.Join("testdata", "bar.txt"),
-			encOutputFilename: filepath.Join("testdata", "story.txt.enc"),
-			decOutputFilename: filepath.Join("testdata", "story.txt.dec"),
-			passphrase:        "iamthebest",
+		"input file not exists": {
+			filename:             filepath.Join("testdata", "bar.txt"),
+			encOutputFilename:    filepath.Join("testdata", "foo.txt"),
+			decOutputFilename:    filepath.Join("testdata", "story.txt.dec"),
+			passphrase:           "iamthebest",
+			optFn:                WithOutputFilename,
+			expectEncErrorString: "open testdata/bar.txt: no such file or directory",
+			expectDecErrorString: "open testdata/foo.txt: no such file or directory",
+		},
+		"invalid encOutputFilename": {
+			filename:             filepath.Join("testdata", "story.txt"),
+			encOutputFilename:    filepath.Join("testdata", ""),
+			decOutputFilename:    filepath.Join("testdata", "story.txt.dec"),
+			passphrase:           "iamthebest",
+			optFn:                WithOutputFilename,
+			expectEncErrorString: "open testdata: is a directory",
+			expectDecErrorString: "read testdata: is a directory",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := EncryptFile(c.filename, c.passphrase, c.optFns)
-			assert.Error(t, err, "EncryptFile(%v, %v) = %v, want error", c.filename, c.passphrase, err)
-			_, err = DecryptFile(c.encOutputFilename, c.passphrase, c.optFns)
-			assert.Error(t, err, "DecryptFile(%v, %v) = %v, want error", c.encOutputFilename, c.passphrase, err)
+			_, err := EncryptFile(c.filename, c.passphrase, c.optFn(c.encOutputFilename))
+			assert.Error(t, err, "EncryptFile(%v, %v, %v) = %v, want error", c.filename, c.passphrase, c.encOutputFilename, err)
+			assert.Equal(
+				t,
+				c.expectEncErrorString,
+				err.Error(),
+				"EncryptFile(%v, %v, %v) = %v, want %v", c.filename, c.passphrase, c.encOutputFilename, err, c.expectEncErrorString)
+			_, err = DecryptFile(c.encOutputFilename, c.passphrase, c.optFn(c.decOutputFilename))
+			assert.Error(t, err, "DecryptFile(%v, %v, %v) = %v, want error", c.encOutputFilename, c.passphrase, c.decOutputFilename, err)
+			assert.Equal(
+				t,
+				c.expectDecErrorString,
+				err.Error(),
+				"DecryptFile(%v, %v, %v) = %v, want %v", c.encOutputFilename, c.passphrase, c.decOutputFilename, err, c.expectDecErrorString)
 		})
 		_cleanTestEncryptDecryptFile(c.encOutputFilename, c.decOutputFilename)
 	}
