@@ -30,8 +30,11 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 )
+
+// PassphraseHashFunc is a function that returns a hash of a passphrase.
+type PassphraseHashFunc func(string) string
 
 // CryptographyOptionsFunc is a type alias for CryptographyOptions functional option
 type CryptographyOptionsFunc func(*CryptographyOptions) error
@@ -39,7 +42,17 @@ type CryptographyOptionsFunc func(*CryptographyOptions) error
 // CryptographyOptions are discrete set of options that are valid for loading the
 // configuration that is used to encrypt/decrypt files.
 type CryptographyOptions struct {
+	CustomHashFunc PassphraseHashFunc
 	OutputFilename string
+}
+
+// WithCustomHashFunc is a helper function to construct functional options
+// that sets a custom hash function for the passphrase.
+func WithCustomHashFunc(fn PassphraseHashFunc) CryptographyOptionsFunc {
+	return func(o *CryptographyOptions) error {
+		o.CustomHashFunc = fn
+		return nil
+	}
 }
 
 // WithOutputFilename is a helper function to construct functional options
@@ -58,10 +71,26 @@ func CreateHash(input string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
+// Evaluate the functional options and set the options in the CryptographyOptions struct
+func evaluateCryptographyInputOptions(options *CryptographyOptions, optFns ...CryptographyOptionsFunc) error {
+	for _, optFn := range optFns {
+		if err := optFn(options); err != nil {
+			return fmt.Errorf("Fail to read cryptography options: %v", err)
+		}
+	}
+
+	return nil
+}
+
 // Encrypt data with a passphrase. Nonce is created by the function.
 // Returns the encrypted data and an error if any.
-func Encrypt(data []byte, passphrase string) ([]byte, error) {
-	block, _ := aes.NewCipher([]byte(CreateHash(passphrase)))
+func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	options := CryptographyOptions{CustomHashFunc: CreateHash}
+	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+		return nil, err
+	}
+
+	block, _ := aes.NewCipher([]byte(options.CustomHashFunc(passphrase)))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
@@ -76,8 +105,13 @@ func Encrypt(data []byte, passphrase string) ([]byte, error) {
 
 // Decrypt data with a passphrase. Returns the decrypted
 // data and an error if any.
-func Decrypt(data []byte, passphrase string) ([]byte, error) {
-	key := []byte(CreateHash(passphrase))
+func Decrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	options := CryptographyOptions{CustomHashFunc: CreateHash}
+	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+		return nil, err
+	}
+
+	key := []byte(options.CustomHashFunc(passphrase))
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -90,7 +124,7 @@ func Decrypt(data []byte, passphrase string) ([]byte, error) {
 	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	return plaintext, nil
 }
@@ -111,21 +145,19 @@ func DecryptFile(filename string, passphrase string, optFns ...CryptographyOptio
 
 // fn is the function to be used to crypt/decrypt the file.
 func _cryptFile(
-	fn func([]byte, string) ([]byte, error),
+	fn func([]byte, string, ...CryptographyOptionsFunc) ([]byte, error),
 	filename string,
 	passphrase string,
 	optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	var options CryptographyOptions
-	for _, optFn := range optFns {
-		if err := optFn(&options); err != nil {
-			return nil, fmt.Errorf("Fail to read cryptography options: %v", err)
-		}
+	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+		return nil, err
 	}
 
-	if content, err := ioutil.ReadFile(filename); err == nil {
-		if data, err := fn(content, passphrase); err == nil {
+	if content, err := os.ReadFile(filename); err == nil {
+		if data, err := fn(content, passphrase, optFns...); err == nil {
 			if options.OutputFilename != "" {
-				if err = ioutil.WriteFile(options.OutputFilename, data, 0644); err != nil {
+				if err = os.WriteFile(options.OutputFilename, data, 0644); err != nil {
 					return nil, err
 				}
 			}
