@@ -64,6 +64,15 @@ func WithOutputFilename(v string) CryptographyOptionsFunc {
 	}
 }
 
+// Generate a random passphrase. Returns a random passphrase and an error if any.
+func GeneratePassphrase(length int) (string, error) {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
 // Create a hash from a string
 func CreateHash(input string) string {
 	hasher := md5.New()

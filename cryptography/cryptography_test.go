@@ -31,6 +31,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestGeneratePassphrase calls GeneratePassphrase and checks the
+// generated passphrase.
+func TestGeneratePassphrase(t *testing.T) {
+	cases := map[string]struct {
+		length       int
+		expectLength int
+	}{
+		"length == 10": {
+			length:       10,
+			expectLength: 10 * 2,
+		},
+		"length == 50": {
+			length:       50,
+			expectLength: 50 * 2,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			actual, err := GeneratePassphrase(c.length)
+			assert.Nil(t, err, "GeneratePassphrase(%v) = %v, want nil", c.length, err)
+			assert.Equal(t, c.expectLength, len(actual), "GeneratePassphrase(%v) = %v, want %v", c.expectLength, actual, c.expectLength)
+		})
+	}
+}
+
 // TestCreateHash calls CreateHash and checks the output
 func TestCreateHash(t *testing.T) {
 	cases := map[string]struct {
