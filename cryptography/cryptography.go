@@ -42,15 +42,15 @@ type CryptographyOptionsFunc func(*CryptographyOptions) error
 // CryptographyOptions are discrete set of options that are valid for loading the
 // configuration that is used to encrypt/decrypt files.
 type CryptographyOptions struct {
-	CustomHashFunc PassphraseHashFunc
+	HashFunc       PassphraseHashFunc
 	OutputFilename string
 }
 
-// WithCustomHashFunc is a helper function to construct functional options
+// WithHashFunc is a helper function to construct functional options
 // that sets a custom hash function for the passphrase.
-func WithCustomHashFunc(fn PassphraseHashFunc) CryptographyOptionsFunc {
+func WithHashFunc(fn PassphraseHashFunc) CryptographyOptionsFunc {
 	return func(o *CryptographyOptions) error {
-		o.CustomHashFunc = fn
+		o.HashFunc = fn
 		return nil
 	}
 }
@@ -94,12 +94,12 @@ func evaluateCryptographyInputOptions(options *CryptographyOptions, optFns ...Cr
 // Encrypt data with a passphrase. Nonce is created by the function.
 // Returns the encrypted data and an error if any.
 func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{CustomHashFunc: CreateHash}
+	options := CryptographyOptions{HashFunc: CreateHash}
 	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
 		return nil, err
 	}
 
-	block, _ := aes.NewCipher([]byte(options.CustomHashFunc(passphrase)))
+	block, _ := aes.NewCipher([]byte(options.HashFunc(passphrase)))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
@@ -115,12 +115,12 @@ func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) 
 // Decrypt data with a passphrase. Returns the decrypted
 // data and an error if any.
 func Decrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{CustomHashFunc: CreateHash}
+	options := CryptographyOptions{HashFunc: CreateHash}
 	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
 		return nil, err
 	}
 
-	key := []byte(options.CustomHashFunc(passphrase))
+	key := []byte(options.HashFunc(passphrase))
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
