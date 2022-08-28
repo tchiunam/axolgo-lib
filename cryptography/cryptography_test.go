@@ -115,7 +115,7 @@ func TestEncryptDecrypt(t *testing.T) {
 			assert.Equal(t, c.data, actualDecrypt, "Decrypt(%v, %v) = %v, want %v", actualEncrypt, c.passphrase, actualDecrypt, c.data)
 
 			// Test with cryptography options
-			_, err = Encrypt(c.data, c.passphrase, WithCustomHashFunc(CreateHash))
+			_, err = Encrypt(c.data, c.passphrase, WithHashFunc(CreateHash))
 			assert.Nil(t, err, "Encrypt(%x, %v) = %v, want nil", c.data, c.passphrase, err)
 		})
 	}
@@ -195,7 +195,7 @@ func TestEncryptDecryptWithHashInvalid(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			assert.Panics(
 				t,
-				func() { Encrypt(c.data, c.passphrase, WithCustomHashFunc(c.hashFunc)) },
+				func() { Encrypt(c.data, c.passphrase, WithHashFunc(c.hashFunc)) },
 				"Decrypt(%x, %v, %v), want panic, %v", c.data, c.passphrase, c.hashFunc)
 		})
 	}
