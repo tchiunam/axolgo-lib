@@ -31,6 +31,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestGeneratePassphrase calls GeneratePassphrase and checks the
+// generated passphrase.
+func TestGeneratePassphrase(t *testing.T) {
+	cases := map[string]struct {
+		length       int
+		expectLength int
+	}{
+		"length == 10": {
+			length:       10,
+			expectLength: 10 * 2,
+		},
+		"length == 50": {
+			length:       50,
+			expectLength: 50 * 2,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			actual, err := GeneratePassphrase(c.length)
+			assert.Nil(t, err, "GeneratePassphrase(%v) = %v, want nil", c.length, err)
+			assert.Equal(t, c.expectLength, len(actual), "GeneratePassphrase(%v) = %v, want %v", c.expectLength, actual, c.expectLength)
+		})
+	}
+}
+
 // TestCreateHash calls CreateHash and checks the output
 func TestCreateHash(t *testing.T) {
 	cases := map[string]struct {
@@ -89,7 +115,7 @@ func TestEncryptDecrypt(t *testing.T) {
 			assert.Equal(t, c.data, actualDecrypt, "Decrypt(%v, %v) = %v, want %v", actualEncrypt, c.passphrase, actualDecrypt, c.data)
 
 			// Test with cryptography options
-			_, err = Encrypt(c.data, c.passphrase, WithCustomHashFunc(CreateHash))
+			_, err = Encrypt(c.data, c.passphrase, WithHashFunc(CreateHash))
 			assert.Nil(t, err, "Encrypt(%x, %v) = %v, want nil", c.data, c.passphrase, err)
 		})
 	}
@@ -169,7 +195,7 @@ func TestEncryptDecryptWithHashInvalid(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			assert.Panics(
 				t,
-				func() { Encrypt(c.data, c.passphrase, WithCustomHashFunc(c.hashFunc)) },
+				func() { Encrypt(c.data, c.passphrase, WithHashFunc(c.hashFunc)) },
 				"Decrypt(%x, %v, %v), want panic, %v", c.data, c.passphrase, c.hashFunc)
 		})
 	}
