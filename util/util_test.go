@@ -99,6 +99,101 @@ func TestExtractFileNameWithoutExtension(t *testing.T) {
 	}
 }
 
+// TestUpdateFileName calls UpdateFileName with a string,
+// checking for a value with customized params.
+func TestUpdateFileName(t *testing.T) {
+	cases := map[string]struct {
+		path       string
+		prefix     string
+		suffix     string
+		expectPath string
+	}{
+		"nil input": {
+			path:       "",
+			prefix:     "",
+			suffix:     "",
+			expectPath: "",
+		},
+		"no extension": {
+			path:       "/etc/path/file",
+			prefix:     "prefix_",
+			suffix:     "_suffix",
+			expectPath: "/etc/path/prefix_file_suffix",
+		},
+		"extension with only suffix": {
+			path:       "/etc/path/file.txt",
+			prefix:     "",
+			suffix:     "_suffix",
+			expectPath: "/etc/path/file_suffix.txt",
+		},
+		"extension with multiple dots and prefix": {
+			path:       "/etc/path/file.tar.gz",
+			prefix:     "prefix_",
+			suffix:     "",
+			expectPath: "/etc/path/prefix_file.tar.gz",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			path := UpdateFileName(
+				c.path,
+				UpdateFileNameParams{
+					Prefix: c.prefix,
+					Suffix: c.suffix,
+				},
+			)
+			assert.Equal(
+				t,
+				c.expectPath,
+				path,
+				"UpdateFileName(%v, %v, %v) = %v, want %v", c.path, c.prefix, c.suffix, path, c.expectPath)
+		})
+	}
+}
+
+// TestAddPrefixToFileName calls AddPrefixToFileName with a string,
+// checking for a value with the prefix added.
+func TestAddPrefixToFileName(t *testing.T) {
+	cases := map[string]struct {
+		path       string
+		prefix     string
+		expectPath string
+	}{
+		"nil input": {
+			path:       "",
+			prefix:     "",
+			expectPath: "",
+		},
+		"no extension": {
+			path:       "/etc/path/file",
+			prefix:     "prefix_",
+			expectPath: "/etc/path/prefix_file",
+		},
+		"extension": {
+			path:       "/etc/path/file.txt",
+			prefix:     "prefix_",
+			expectPath: "/etc/path/prefix_file.txt",
+		},
+		"extension with multiple dots": {
+			path:       "/etc/path/file.tar.gz",
+			prefix:     "prefix_",
+			expectPath: "/etc/path/prefix_file.tar.gz",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			path := AddPrefixToFileName(c.path, c.prefix)
+			assert.Equal(
+				t,
+				c.expectPath,
+				path,
+				"AddPrefixToFileName(%v, %v) = %v, want %v", c.path, c.prefix, path, c.expectPath)
+		})
+	}
+}
+
 // TestAddSuffixToFileName calls AddSuffixToFileName with a string,
 // checking for a value with the suffix added.
 func TestAddSuffixToFileName(t *testing.T) {
