@@ -40,3 +40,18 @@ func ExpandPath(path string) string {
 
 	return path
 }
+
+// Extract the file name without the extension
+func ExtractFileNameWithoutExtension(path string) string {
+	if path == "" {
+		return ""
+	}
+
+	// Remove the base path in case the file name has no extension
+	// which causes it not to be processed in the next step.
+	path = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	for strings.Contains(path, ".") {
+		path = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	}
+	return path
+}

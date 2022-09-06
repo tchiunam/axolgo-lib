@@ -61,3 +61,40 @@ func TestExpandPath(t *testing.T) {
 		})
 	}
 }
+
+// TestExtractFileNameWithoutExtension calls ExtractFileNameWithoutExtension
+// with a string, checking for a value with the extension removed.
+func TestExtractFileNameWithoutExtension(t *testing.T) {
+	cases := map[string]struct {
+		path           string
+		expectFileName string
+	}{
+		"nil input": {
+			path:           "",
+			expectFileName: "",
+		},
+		"no extension": {
+			path:           "/etc/path/file",
+			expectFileName: "file",
+		},
+		"extension": {
+			path:           "/etc/path/file.txt",
+			expectFileName: "file",
+		},
+		"extension with multiple dots": {
+			path:           "/etc/path/file.tar.gz",
+			expectFileName: "file",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			fileName := ExtractFileNameWithoutExtension(c.path)
+			assert.Equal(
+				t,
+				c.expectFileName,
+				fileName,
+				"ExtractFileNameWithoutExtension(%v) = %v, want %v", c.path, fileName, c.expectFileName)
+		})
+	}
+}
