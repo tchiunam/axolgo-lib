@@ -99,55 +99,74 @@ func TestExtractFileNameWithoutExtension(t *testing.T) {
 	}
 }
 
-// TestUpdateFileName calls UpdateFileName with a string,
+// TestUpdateFilePath calls UpdateFilePath with a string,
 // checking for a value with customized params.
-func TestUpdateFileName(t *testing.T) {
+func TestUpdateFilePath(t *testing.T) {
 	cases := map[string]struct {
-		path       string
-		prefix     string
-		suffix     string
-		expectPath string
+		path              string
+		fileNamePrefix    string
+		fileNameSuffix    string
+		fileNameExtension string
+		expectPath        string
 	}{
 		"nil input": {
-			path:       "",
-			prefix:     "",
-			suffix:     "",
-			expectPath: "",
+			path:              "",
+			fileNamePrefix:    "",
+			fileNameSuffix:    "",
+			fileNameExtension: "",
+			expectPath:        "",
 		},
 		"no extension": {
-			path:       "/etc/path/file",
-			prefix:     "prefix_",
-			suffix:     "_suffix",
-			expectPath: "/etc/path/prefix_file_suffix",
+			path:              "/etc/path/file",
+			fileNamePrefix:    "prefix_",
+			fileNameSuffix:    "_suffix",
+			fileNameExtension: "",
+			expectPath:        "/etc/path/prefix_file_suffix",
 		},
-		"extension with only suffix": {
-			path:       "/etc/path/file.txt",
-			prefix:     "",
-			suffix:     "_suffix",
-			expectPath: "/etc/path/file_suffix.txt",
+		"replace extension and suffix": {
+			path:              "/etc/path/file.txt",
+			fileNamePrefix:    "",
+			fileNameSuffix:    "_suffix",
+			fileNameExtension: ".ini",
+			expectPath:        "/etc/path/file_suffix.ini",
 		},
 		"extension with multiple dots and prefix": {
-			path:       "/etc/path/file.tar.gz",
-			prefix:     "prefix_",
-			suffix:     "",
-			expectPath: "/etc/path/prefix_file.tar.gz",
+			path:              "/etc/path/file.tar.gz",
+			fileNamePrefix:    "prefix_",
+			fileNameSuffix:    "",
+			fileNameExtension: "",
+			expectPath:        "/etc/path/prefix_file.tar.gz",
+		},
+		"replace extension with multiple dots": {
+			path:              "/etc/path/file.tar.gz",
+			fileNamePrefix:    "prefix_",
+			fileNameSuffix:    "",
+			fileNameExtension: ".ini",
+			expectPath:        "/etc/path/prefix_file.ini",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			path := UpdateFileName(
+			path := UpdateFilePath(
 				c.path,
-				UpdateFileNameParams{
-					Prefix: c.prefix,
-					Suffix: c.suffix,
+				UpdateFilePathParams{
+					FileNamePrefix:    c.fileNamePrefix,
+					FileNameSuffix:    c.fileNameSuffix,
+					FileNameExtension: c.fileNameExtension,
 				},
 			)
 			assert.Equal(
 				t,
 				c.expectPath,
 				path,
-				"UpdateFileName(%v, %v, %v) = %v, want %v", c.path, c.prefix, c.suffix, path, c.expectPath)
+				"UpdateFilePath(%v, %v, %v, %v) = %v, want %v",
+				c.path,
+				c.fileNamePrefix,
+				c.fileNameSuffix,
+				c.fileNameExtension,
+				path,
+				c.expectPath)
 		})
 	}
 }
