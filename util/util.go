@@ -57,32 +57,33 @@ func ExtractFileNameWithoutExtension(path string) string {
 	return path
 }
 
-// Parameters for the `UpdateFileName` function
-type UpdateFileNameParams struct {
-	Prefix string
-	Suffix string
+// Parameters for the `UpdateFilePath` function
+type UpdateFilePathParams struct {
+	FileNamePrefix    string
+	FileNameSuffix    string
+	FileNameExtension string // If empty, the original extension will be used
 }
 
-// Update the file name with prefix, suffix or other customizations
-func UpdateFileName(path string, params UpdateFileNameParams) string {
+// Update the file path with file name prefix, file name suffix
+// or other customizations.
+func UpdateFilePath(path string, params UpdateFilePathParams) string {
 	if path == "" {
 		return ""
 	}
 
 	fileName := filepath.Base(path)
 	f := strings.Split(fileName, ".")
-	var newFileName string
-	if params.Prefix != "" {
-		newFileName = params.Prefix
-	}
+	newFileName := params.FileNamePrefix
 	newFileName += f[0]
-	if params.Suffix != "" {
-		newFileName += params.Suffix
-	}
+	newFileName += params.FileNameSuffix
 
-	// Append the extensions (ex. .tar.gz) to the file name
-	for i := 1; i < len(f); i++ {
-		newFileName = fmt.Sprintf("%s.%s", newFileName, f[i])
+	if params.FileNameExtension == "" {
+		// Append the extension (ex. .tar.gz) to the file name
+		for i := 1; i < len(f); i++ {
+			newFileName = fmt.Sprintf("%s.%s", newFileName, f[i])
+		}
+	} else {
+		newFileName = fmt.Sprintf("%s%s", newFileName, params.FileNameExtension)
 	}
 
 	return filepath.Join(filepath.Dir(path), newFileName)
@@ -90,10 +91,10 @@ func UpdateFileName(path string, params UpdateFileNameParams) string {
 
 // Add prefix to file name
 func AddPrefixToFileName(path string, prefix string) string {
-	return UpdateFileName(path, UpdateFileNameParams{Prefix: prefix})
+	return UpdateFilePath(path, UpdateFilePathParams{FileNamePrefix: prefix})
 }
 
 // Add suffix to file name
 func AddSuffixToFileName(path string, suffix string) string {
-	return UpdateFileName(path, UpdateFileNameParams{Suffix: suffix})
+	return UpdateFilePath(path, UpdateFilePathParams{FileNameSuffix: suffix})
 }
