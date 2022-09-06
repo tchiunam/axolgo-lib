@@ -23,6 +23,7 @@ THE SOFTWARE.
 package util
 
 import (
+	"fmt"
 	"os/user"
 	"path/filepath"
 	"strings"
@@ -39,4 +40,61 @@ func ExpandPath(path string) string {
 	}
 
 	return path
+}
+
+// Extract the file name without the extension
+func ExtractFileNameWithoutExtension(path string) string {
+	if path == "" {
+		return ""
+	}
+
+	// Remove the base path in case the file name has no extension
+	// which causes it not to be processed in the next step.
+	path = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	for strings.Contains(path, ".") {
+		path = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	}
+	return path
+}
+
+// Parameters for the `UpdateFilePath` function
+type UpdateFilePathParams struct {
+	FileNamePrefix    string
+	FileNameSuffix    string
+	FileNameExtension string // If empty, the original extension will be used
+}
+
+// Update the file path with file name prefix, file name suffix
+// or other customizations.
+func UpdateFilePath(path string, params UpdateFilePathParams) string {
+	if path == "" {
+		return ""
+	}
+
+	fileName := filepath.Base(path)
+	f := strings.Split(fileName, ".")
+	newFileName := params.FileNamePrefix
+	newFileName += f[0]
+	newFileName += params.FileNameSuffix
+
+	if params.FileNameExtension == "" {
+		// Append the extension (ex. .tar.gz) to the file name
+		for i := 1; i < len(f); i++ {
+			newFileName = fmt.Sprintf("%s.%s", newFileName, f[i])
+		}
+	} else {
+		newFileName = fmt.Sprintf("%s%s", newFileName, params.FileNameExtension)
+	}
+
+	return filepath.Join(filepath.Dir(path), newFileName)
+}
+
+// Add prefix to file name
+func AddPrefixToFileName(path string, prefix string) string {
+	return UpdateFilePath(path, UpdateFilePathParams{FileNamePrefix: prefix})
+}
+
+// Add suffix to file name
+func AddSuffixToFileName(path string, suffix string) string {
+	return UpdateFilePath(path, UpdateFilePathParams{FileNameSuffix: suffix})
 }
