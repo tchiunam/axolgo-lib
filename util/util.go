@@ -23,6 +23,7 @@ THE SOFTWARE.
 package util
 
 import (
+	"fmt"
 	"os/user"
 	"path/filepath"
 	"strings"
@@ -54,4 +55,21 @@ func ExtractFileNameWithoutExtension(path string) string {
 		path = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	}
 	return path
+}
+
+// Add suffix to file name
+func AddSuffixToFileName(path string, suffix string) string {
+	if path == "" {
+		return ""
+	}
+
+	fileName := filepath.Base(path)
+	f := strings.Split(fileName, ".")
+	newFileName := fmt.Sprintf("%s%s", f[0], suffix)
+	// Append the extensions (ex. .tar.gz) to the file name
+	for i := 1; i < len(f); i++ {
+		newFileName = fmt.Sprintf("%s.%s", newFileName, f[i])
+	}
+
+	return filepath.Join(filepath.Dir(path), newFileName)
 }

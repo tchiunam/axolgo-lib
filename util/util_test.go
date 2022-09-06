@@ -98,3 +98,45 @@ func TestExtractFileNameWithoutExtension(t *testing.T) {
 		})
 	}
 }
+
+// TestAddSuffixToFileName calls AddSuffixToFileName with a string,
+// checking for a value with the suffix added.
+func TestAddSuffixToFileName(t *testing.T) {
+	cases := map[string]struct {
+		path       string
+		suffix     string
+		expectPath string
+	}{
+		"nil input": {
+			path:       "",
+			suffix:     "",
+			expectPath: "",
+		},
+		"no extension": {
+			path:       "/etc/path/file",
+			suffix:     "_suffix",
+			expectPath: "/etc/path/file_suffix",
+		},
+		"extension": {
+			path:       "/etc/path/file.txt",
+			suffix:     "_suffix",
+			expectPath: "/etc/path/file_suffix.txt",
+		},
+		"extension with multiple dots": {
+			path:       "/etc/path/file.tar.gz",
+			suffix:     "_suffix",
+			expectPath: "/etc/path/file_suffix.tar.gz",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			path := AddSuffixToFileName(c.path, c.suffix)
+			assert.Equal(
+				t,
+				c.expectPath,
+				path,
+				"AddSuffixToFileName(%v, %v) = %v, want %v", c.path, c.suffix, path, c.expectPath)
+		})
+	}
+}
