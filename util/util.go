@@ -57,19 +57,43 @@ func ExtractFileNameWithoutExtension(path string) string {
 	return path
 }
 
-// Add suffix to file name
-func AddSuffixToFileName(path string, suffix string) string {
+// Parameters for the `UpdateFileName` function
+type UpdateFileNameParams struct {
+	Prefix string
+	Suffix string
+}
+
+// Update the file name with prefix, suffix or other customizations
+func UpdateFileName(path string, params UpdateFileNameParams) string {
 	if path == "" {
 		return ""
 	}
 
 	fileName := filepath.Base(path)
 	f := strings.Split(fileName, ".")
-	newFileName := fmt.Sprintf("%s%s", f[0], suffix)
+	var newFileName string
+	if params.Prefix != "" {
+		newFileName = params.Prefix
+	}
+	newFileName += f[0]
+	if params.Suffix != "" {
+		newFileName += params.Suffix
+	}
+
 	// Append the extensions (ex. .tar.gz) to the file name
 	for i := 1; i < len(f); i++ {
 		newFileName = fmt.Sprintf("%s.%s", newFileName, f[i])
 	}
 
 	return filepath.Join(filepath.Dir(path), newFileName)
+}
+
+// Add prefix to file name
+func AddPrefixToFileName(path string, prefix string) string {
+	return UpdateFileName(path, UpdateFileNameParams{Prefix: prefix})
+}
+
+// Add suffix to file name
+func AddSuffixToFileName(path string, suffix string) string {
+	return UpdateFileName(path, UpdateFileNameParams{Suffix: suffix})
 }
