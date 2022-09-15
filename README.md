@@ -67,6 +67,7 @@
 </div>
 
 <br />
+
 This is the library of the Axolotl series in Golang. It serves as the base of other axol libraries.
 
 Go package: https://pkg.go.dev/github.com/tchiunam/axolgo-lib
@@ -102,7 +103,7 @@ go test -coverpkg=./... ./...
 
 ## Test report
 ## Code Coverage graph
-![Code Coverage graph](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graphs/tree.svg?token=B5DNGRMYUG)
+[![Code Coverage graph](https://codecov.io/gh/tchiunam/axolgo-lib/branch/main/graphs/tree.svg?token=B5DNGRMYUG)](https://app.codecov.io/gh/tchiunam/axolgo-lib)
 
 ---
 #### See more  
