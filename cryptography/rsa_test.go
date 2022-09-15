@@ -24,6 +24,7 @@ package cryptography
 
 import (
 	"crypto/rsa"
+	"hash"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,6 +79,7 @@ func TestEncryptRSA(t *testing.T) {
 	cases := map[string]struct {
 		data      []byte
 		publicKey rsa.PublicKey
+		hashFunc  hash.Hash
 	}{
 		"normal input with 2048 bit": {
 			data: []byte("hello world"),
@@ -85,6 +87,7 @@ func TestEncryptRSA(t *testing.T) {
 				_, publicKey, _ := GenerateRSAKeyPair(2048)
 				return *publicKey
 			}(),
+			hashFunc: nil,
 		},
 		"normal input with 4096 bit": {
 			data: []byte("hello world"),
@@ -92,13 +95,43 @@ func TestEncryptRSA(t *testing.T) {
 				_, publicKey, _ := GenerateRSAKeyPair(4096)
 				return *publicKey
 			}(),
+			hashFunc: nil,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := EncryptRSA(c.data, c.publicKey)
+			_, err := EncryptRSA(c.data, c.publicKey, WithOAEPHashFunc(c.hashFunc))
 			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
+		})
+	}
+}
+
+// TestEncryptRSAInvalid calls the EncryptRSA function to make sure
+// errors are returned when invalid parameters are passed.
+func TestEncryptRSAInvalid(t *testing.T) {
+	cases := map[string]struct {
+		data              []byte
+		publicKey         rsa.PublicKey
+		optFn             func(*CryptographyOptions) error
+		expectErrorString string
+	}{
+		"errornous hash function": {
+			data: []byte("hello world"),
+			publicKey: func() rsa.PublicKey {
+				_, publicKey, _ := GenerateRSAKeyPair(2048)
+				return *publicKey
+			}(),
+			optFn:             MockWithCryptographyOptionsError("foo"),
+			expectErrorString: "Fail to read cryptography options: mock error",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := EncryptRSA(c.data, c.publicKey, c.optFn)
+			assert.Error(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
+			assert.Equal(t, c.expectErrorString, err.Error(), "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
 		})
 	}
 }
