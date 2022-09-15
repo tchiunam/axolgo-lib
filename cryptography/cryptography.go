@@ -57,6 +57,15 @@ func WithHashFunc(fn PassphraseHashFunc) CryptographyOptionsFunc {
 	}
 }
 
+// WithOAEPHashFunc is a helper function to construct functional options
+// that sets a custom OAEP hash function for the message.
+func WithOAEPHashFunc(fn hash.Hash) CryptographyOptionsFunc {
+	return func(o *CryptographyOptions) error {
+		o.OAEPHashFunc = fn
+		return nil
+	}
+}
+
 // WithOutputFilename is a helper function to construct functional options
 // that sets the output filename for the encrypted/decrypted file.
 func WithOutputFilename(v string) CryptographyOptionsFunc {
