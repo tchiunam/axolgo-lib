@@ -41,7 +41,7 @@ func GenerateRSAKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 // Encrypt a message using RSA public key
 func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	options := CryptographyOptions{HashFunc: CreateHash}
-	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
