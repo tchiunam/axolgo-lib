@@ -29,6 +29,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 )
@@ -43,6 +44,7 @@ type CryptographyOptionsFunc func(*CryptographyOptions) error
 // configuration that is used to encrypt/decrypt files.
 type CryptographyOptions struct {
 	HashFunc       PassphraseHashFunc
+	OAEPHashFunc   hash.Hash
 	OutputFilename string
 }
 
