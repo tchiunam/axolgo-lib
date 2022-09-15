@@ -124,22 +124,22 @@ func TestEncryptDecrypt(t *testing.T) {
 // TestEncryptDecryptInvalid tests the Encrypt and Decrypt functions with invalid input
 func TestEncryptDecryptInvalid(t *testing.T) {
 	cases := map[string]struct {
-		optFns     func(*CryptographyOptions) error
+		optFn      func(*CryptographyOptions) error
 		data       []byte
 		passphrase string
 	}{
 		"normal input": {
 			data:       []byte("The quick brown fox jumps over the lazy dog"),
 			passphrase: "iamthebest",
-			optFns:     MockWithCryptographyOptionsError("foo.txt"),
+			optFn:      MockWithCryptographyOptionsError("foo.txt"),
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := Encrypt(c.data, c.passphrase, c.optFns)
+			_, err := Encrypt(c.data, c.passphrase, c.optFn)
 			assert.Error(t, err, "Encrypt(%x, %v) = %v, want error", c.data, c.passphrase, err)
-			_, err = Decrypt(c.data, c.passphrase, c.optFns)
+			_, err = Decrypt(c.data, c.passphrase, c.optFn)
 			assert.Error(t, err, "Decrypt(%x, %v) = %v, want error", c.data, c.passphrase, err)
 		})
 	}
@@ -148,7 +148,7 @@ func TestEncryptDecryptInvalid(t *testing.T) {
 // TestDecryptPanic calls Decrypt and checks the panic
 func TestDecryptPanic(t *testing.T) {
 	cases := map[string]struct {
-		optFns     func(*CryptographyOptions) error
+		optFn      func(*CryptographyOptions) error
 		data       []byte
 		passphrase string
 	}{
@@ -223,7 +223,7 @@ func TestEncryptDecryptFile(t *testing.T) {
 		encOutputFilename string
 		decOutputFilename string
 		passphrase        string
-		optFns            func(*CryptographyOptions) error
+		optFn             func(*CryptographyOptions) error
 	}{
 		"normal input": {
 			filename:          filepath.Join("testdata", "story.txt"),
