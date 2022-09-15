@@ -83,7 +83,7 @@ func CreateHash(input string) string {
 }
 
 // Evaluate the functional options and set the options in the CryptographyOptions struct
-func evaluateCryptographyInputOptions(options *CryptographyOptions, optFns ...CryptographyOptionsFunc) error {
+func (options *CryptographyOptions) merge(optFns ...CryptographyOptionsFunc) error {
 	for _, optFn := range optFns {
 		if err := optFn(options); err != nil {
 			return fmt.Errorf("Fail to read cryptography options: %v", err)
@@ -97,7 +97,7 @@ func evaluateCryptographyInputOptions(options *CryptographyOptions, optFns ...Cr
 // Returns the encrypted data and an error if any.
 func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	options := CryptographyOptions{HashFunc: CreateHash}
-	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -118,7 +118,7 @@ func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) 
 // data and an error if any.
 func Decrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	options := CryptographyOptions{HashFunc: CreateHash}
-	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -154,14 +154,14 @@ func DecryptFile(filename string, passphrase string, optFns ...CryptographyOptio
 	return _cryptFile(Decrypt, filename, passphrase, optFns...)
 }
 
-// fn is the function to be used to crypt/decrypt the file.
+// This is the function to be used to encrypt or decrypt a file.
 func _cryptFile(
 	fn func([]byte, string, ...CryptographyOptionsFunc) ([]byte, error),
 	filename string,
 	passphrase string,
 	optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	var options CryptographyOptions
-	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
