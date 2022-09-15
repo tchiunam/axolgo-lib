@@ -23,6 +23,7 @@ THE SOFTWARE.
 package cryptography
 
 import (
+	"crypto/rsa"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,6 +68,37 @@ func TestGenerateRSAKeyPairInvalid(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			_, _, err := GenerateRSAKeyPair(c.bits)
 			assert.Error(t, err, "GenerateRSAKeyPair(%v) = %v", c.bits, err)
+		})
+	}
+}
+
+// TestEncryptRSA calls the EncryptRSA function to make sure
+// the RSA encryption works.
+func TestEncryptRSA(t *testing.T) {
+	cases := map[string]struct {
+		data      []byte
+		publicKey rsa.PublicKey
+	}{
+		"normal input with 2048 bit": {
+			data: []byte("hello world"),
+			publicKey: func() rsa.PublicKey {
+				_, publicKey, _ := GenerateRSAKeyPair(2048)
+				return *publicKey
+			}(),
+		},
+		"normal input with 4096 bit": {
+			data: []byte("hello world"),
+			publicKey: func() rsa.PublicKey {
+				_, publicKey, _ := GenerateRSAKeyPair(4096)
+				return *publicKey
+			}(),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := EncryptRSA(c.data, c.publicKey)
+			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
 		})
 	}
 }

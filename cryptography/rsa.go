@@ -25,6 +25,7 @@ package cryptography
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 )
 
 // Generate a new RSA key pair
@@ -35,4 +36,27 @@ func GenerateRSAKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	}
 
 	return privateKey, &privateKey.PublicKey, nil
+}
+
+// Encrypt a message using RSA public key
+func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	options := CryptographyOptions{HashFunc: CreateHash}
+	if err := evaluateCryptographyInputOptions(&options, optFns...); err != nil {
+		return nil, err
+	}
+
+	hashFunc := options.OAEPHashFunc
+	if hashFunc == nil {
+		hashFunc = sha256.New()
+	}
+	if encryptedBytes, err := rsa.EncryptOAEP(
+		hashFunc,
+		rand.Reader,
+		&publicKey,
+		data,
+		nil); err == nil {
+		return encryptedBytes, nil
+	} else {
+		return nil, err
+	}
 }
