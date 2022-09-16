@@ -23,6 +23,7 @@ THE SOFTWARE.
 package cryptography
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -40,17 +41,13 @@ func GenerateRSAKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 
 // Encrypt a message using RSA public key
 func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{HashFunc: CreateHash}
+	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
 	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
-	hashFunc := options.OAEPHashFunc
-	if hashFunc == nil {
-		hashFunc = sha256.New()
-	}
 	if encryptedBytes, err := rsa.EncryptOAEP(
-		hashFunc,
+		options.OAEPHashFunc,
 		rand.Reader,
 		&publicKey,
 		data,
@@ -63,17 +60,13 @@ func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOpti
 
 // Decrypt a message using RSA public key
 func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{HashFunc: CreateHash}
+	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
 	if err := options.merge(optFns...); err != nil {
 		return nil, err
 	}
 
-	hashFunc := options.OAEPHashFunc
-	if hashFunc == nil {
-		hashFunc = sha256.New()
-	}
 	if decryptedBytes, err := rsa.DecryptOAEP(
-		hashFunc,
+		options.OAEPHashFunc,
 		rand.Reader,
 		privateKey,
 		data,
@@ -82,4 +75,21 @@ func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyO
 	} else {
 		return nil, err
 	}
+}
+
+// Sign a message using RSA private key
+func SignRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
+	if err := options.merge(optFns...); err != nil {
+		return nil, err
+	}
+
+	msgHash := options.OAEPHashFunc
+	_, err := msgHash.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	msgHashSum := msgHash.Sum(nil)
+
+	return rsa.SignPSS(rand.Reader, privateKey, crypto.SHA256, msgHashSum, nil)
 }
