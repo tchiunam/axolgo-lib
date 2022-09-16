@@ -20,13 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cryptography
+package rsa
 
 import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+
+	"github.com/tchiunam/axolgo-lib/cryptography"
 )
 
 // Generate a new RSA key pair
@@ -40,9 +42,9 @@ func GenerateRSAKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 }
 
 // Encrypt a message using RSA public key
-func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
-	if err := options.merge(optFns...); err != nil {
+func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...cryptography.CryptographyOptionsFunc) ([]byte, error) {
+	options := cryptography.CryptographyOptions{OAEPHashFunc: sha256.New()}
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -59,9 +61,9 @@ func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOpti
 }
 
 // Decrypt a message using RSA public key
-func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
-	if err := options.merge(optFns...); err != nil {
+func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...cryptography.CryptographyOptionsFunc) ([]byte, error) {
+	options := cryptography.CryptographyOptions{OAEPHashFunc: sha256.New()}
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -78,9 +80,9 @@ func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyO
 }
 
 // Sign a message using RSA private key
-func SignRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
-	options := CryptographyOptions{OAEPHashFunc: sha256.New()}
-	if err := options.merge(optFns...); err != nil {
+func SignRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...cryptography.CryptographyOptionsFunc) ([]byte, error) {
+	options := cryptography.CryptographyOptions{OAEPHashFunc: sha256.New()}
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
