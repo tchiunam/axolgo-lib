@@ -60,3 +60,26 @@ func EncryptRSA(data []byte, publicKey rsa.PublicKey, optFns ...CryptographyOpti
 		return nil, err
 	}
 }
+
+// Decrypt a message using RSA public key
+func DecryptRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...CryptographyOptionsFunc) ([]byte, error) {
+	options := CryptographyOptions{HashFunc: CreateHash}
+	if err := options.merge(optFns...); err != nil {
+		return nil, err
+	}
+
+	hashFunc := options.OAEPHashFunc
+	if hashFunc == nil {
+		hashFunc = sha256.New()
+	}
+	if decryptedBytes, err := rsa.DecryptOAEP(
+		hashFunc,
+		rand.Reader,
+		privateKey,
+		data,
+		nil); err == nil {
+		return decryptedBytes, nil
+	} else {
+		return nil, err
+	}
+}

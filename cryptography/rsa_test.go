@@ -73,27 +73,27 @@ func TestGenerateRSAKeyPairInvalid(t *testing.T) {
 	}
 }
 
-// TestEncryptRSA calls the EncryptRSA function to make sure
-// the RSA encryption works.
-func TestEncryptRSA(t *testing.T) {
+// TestEncryptDecryptRSA calls the EncryptRSA and DecryptRSA function
+// to make sure they return the original data.
+func TestEncryptDecryptRSA(t *testing.T) {
 	cases := map[string]struct {
-		data      []byte
-		publicKey rsa.PublicKey
-		hashFunc  hash.Hash
+		data       []byte
+		privateKey *rsa.PrivateKey
+		hashFunc   hash.Hash
 	}{
 		"normal input with 2048 bit": {
 			data: []byte("hello world"),
-			publicKey: func() rsa.PublicKey {
-				_, publicKey, _ := GenerateRSAKeyPair(2048)
-				return *publicKey
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(2048)
+				return privateKey
 			}(),
 			hashFunc: nil,
 		},
 		"normal input with 4096 bit": {
 			data: []byte("hello world"),
-			publicKey: func() rsa.PublicKey {
-				_, publicKey, _ := GenerateRSAKeyPair(4096)
-				return *publicKey
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(4096)
+				return privateKey
 			}(),
 			hashFunc: nil,
 		},
@@ -101,37 +101,58 @@ func TestEncryptRSA(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := EncryptRSA(c.data, c.publicKey, WithOAEPHashFunc(c.hashFunc))
-			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
+			encryptedBytes, err := EncryptRSA(c.data, c.privateKey.PublicKey, WithOAEPHashFunc(c.hashFunc))
+			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
+			decryptedBytes, err := DecryptRSA(encryptedBytes, c.privateKey, WithOAEPHashFunc(c.hashFunc))
+			assert.NoError(t, err, "DecryptRSA(%v, %v) = %v", encryptedBytes, c.privateKey, err)
+			assert.Equal(
+				t,
+				string(c.data),
+				string(decryptedBytes),
+				"%v and %v should be equal", string(c.data), string(decryptedBytes))
 		})
 	}
 }
 
-// TestEncryptRSAInvalid calls the EncryptRSA function to make sure
-// errors are returned when invalid parameters are passed.
-func TestEncryptRSAInvalid(t *testing.T) {
+// TestEncryptDecryptRSAInvalid calls the EncryptRSA and DecryptRSA
+// function to make sure errors are returned when invalid parameters are passed.
+func TestEncryptDecryptRSAInvalid(t *testing.T) {
 	cases := map[string]struct {
-		data              []byte
-		publicKey         rsa.PublicKey
-		optFn             func(*CryptographyOptions) error
-		expectErrorString string
+		data                 []byte
+		privateKey           *rsa.PrivateKey
+		optFn                func(*CryptographyOptions) error
+		expectEncErrorString string
+		expectDecErrorString string
 	}{
 		"errornous hash function": {
 			data: []byte("hello world"),
-			publicKey: func() rsa.PublicKey {
-				_, publicKey, _ := GenerateRSAKeyPair(2048)
-				return *publicKey
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(2048)
+				return privateKey
 			}(),
-			optFn:             MockWithCryptographyOptionsError("foo"),
-			expectErrorString: "Fail to read cryptography options: mock error",
+			optFn:                MockWithCryptographyOptionsError("foo"),
+			expectEncErrorString: "Fail to read cryptography options: mock error",
+			expectDecErrorString: "Fail to read cryptography options: mock error",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := EncryptRSA(c.data, c.publicKey, c.optFn)
-			assert.Error(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
-			assert.Equal(t, c.expectErrorString, err.Error(), "EncryptRSA(%v, %v) = %v", c.data, c.publicKey, err)
+			_, err := EncryptRSA(c.data, c.privateKey.PublicKey, c.optFn)
+			assert.Error(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
+			assert.Equal(
+				t,
+				c.expectEncErrorString,
+				err.Error(),
+				"EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
+			// Doesn't matter what the encrypted data is, as long as it's not nil
+			_, err = DecryptRSA(c.data, c.privateKey, c.optFn)
+			assert.Error(t, err, "DecryptRSA(%v, %v) = %v", c.data, c.privateKey, err)
+			assert.Equal(
+				t,
+				c.expectDecErrorString,
+				err.Error(),
+				"DecryptRSA(%v, %v) = %v", c.data, c.privateKey, err)
 		})
 	}
 }
