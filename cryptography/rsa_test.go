@@ -24,7 +24,7 @@ package cryptography
 
 import (
 	"crypto/rsa"
-	"hash"
+	"crypto/sha256"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -79,7 +79,6 @@ func TestEncryptDecryptRSA(t *testing.T) {
 	cases := map[string]struct {
 		data       []byte
 		privateKey *rsa.PrivateKey
-		hashFunc   hash.Hash
 	}{
 		"normal input with 2048 bit": {
 			data: []byte("hello world"),
@@ -87,7 +86,6 @@ func TestEncryptDecryptRSA(t *testing.T) {
 				privateKey, _, _ := GenerateRSAKeyPair(2048)
 				return privateKey
 			}(),
-			hashFunc: nil,
 		},
 		"normal input with 4096 bit": {
 			data: []byte("hello world"),
@@ -95,15 +93,14 @@ func TestEncryptDecryptRSA(t *testing.T) {
 				privateKey, _, _ := GenerateRSAKeyPair(4096)
 				return privateKey
 			}(),
-			hashFunc: nil,
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			encryptedBytes, err := EncryptRSA(c.data, c.privateKey.PublicKey, WithOAEPHashFunc(c.hashFunc))
-			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
-			decryptedBytes, err := DecryptRSA(encryptedBytes, c.privateKey, WithOAEPHashFunc(c.hashFunc))
+			encryptedBytes, err := EncryptRSA(c.data, c.privateKey.PublicKey, WithOAEPHashFunc(sha256.New()))
+			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", string(c.data), c.privateKey.PublicKey, err)
+			decryptedBytes, err := DecryptRSA(encryptedBytes, c.privateKey)
 			assert.NoError(t, err, "DecryptRSA(%v, %v) = %v", encryptedBytes, c.privateKey, err)
 			assert.Equal(
 				t,
@@ -139,20 +136,82 @@ func TestEncryptDecryptRSAInvalid(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := EncryptRSA(c.data, c.privateKey.PublicKey, c.optFn)
-			assert.Error(t, err, "EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
+			assert.Error(t, err, "EncryptRSA(%v, %v) = %v", string(c.data), c.privateKey.PublicKey, err)
 			assert.Equal(
 				t,
 				c.expectEncErrorString,
 				err.Error(),
-				"EncryptRSA(%v, %v) = %v", c.data, c.privateKey.PublicKey, err)
+				"EncryptRSA(%v, %v) = %v", string(c.data), c.privateKey.PublicKey, err)
 			// Doesn't matter what the encrypted data is, as long as it's not nil
 			_, err = DecryptRSA(c.data, c.privateKey, c.optFn)
-			assert.Error(t, err, "DecryptRSA(%v, %v) = %v", c.data, c.privateKey, err)
+			assert.Error(t, err, "DecryptRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
 			assert.Equal(
 				t,
 				c.expectDecErrorString,
 				err.Error(),
-				"DecryptRSA(%v, %v) = %v", c.data, c.privateKey, err)
+				"DecryptRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
+		})
+	}
+}
+
+// TestSignRSA calls the SignRSA to make sure it can sign data
+func TestSignRSA(t *testing.T) {
+	cases := map[string]struct {
+		data       []byte
+		privateKey *rsa.PrivateKey
+	}{
+		"normal input with 2048 bit": {
+			data: []byte("hello world"),
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(2048)
+				return privateKey
+			}(),
+		},
+		"normal input with 4096 bit": {
+			data: []byte("hello world"),
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(4096)
+				return privateKey
+			}(),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := SignRSA(c.data, c.privateKey)
+			assert.NoError(t, err, "SignRSA(%v, %v) = %v", c.data, c.privateKey, err)
+		})
+	}
+}
+
+// TestSignRSAInvalid calls the SignRSA to make sure errors are returned
+func TestSignRSAInvalid(t *testing.T) {
+	cases := map[string]struct {
+		data              []byte
+		privateKey        *rsa.PrivateKey
+		optFn             func(*CryptographyOptions) error
+		expectErrorString string
+	}{
+		"errornous hash function": {
+			data: []byte("hello world"),
+			privateKey: func() *rsa.PrivateKey {
+				privateKey, _, _ := GenerateRSAKeyPair(2048)
+				return privateKey
+			}(),
+			optFn:             MockWithCryptographyOptionsError("foo"),
+			expectErrorString: "Fail to read cryptography options: mock error",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := SignRSA(c.data, c.privateKey, c.optFn)
+			assert.Error(t, err, "SignRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
+			assert.Equal(
+				t,
+				c.expectErrorString,
+				err.Error(),
+				"SignRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
 		})
 	}
 }
