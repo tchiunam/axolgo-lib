@@ -20,14 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cryptography
+package rsa
 
 import (
 	"crypto/rsa"
 	"crypto/sha256"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tchiunam/axolgo-lib/cryptography"
 )
 
 // TestGenerateRSAKeyPair calls the GenerateRSAKeyPair function
@@ -98,7 +100,10 @@ func TestEncryptDecryptRSA(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			encryptedBytes, err := EncryptRSA(c.data, c.privateKey.PublicKey, WithOAEPHashFunc(sha256.New()))
+			encryptedBytes, err := EncryptRSA(
+				c.data,
+				c.privateKey.PublicKey,
+				cryptography.WithOAEPHashFunc(sha256.New()))
 			assert.NoError(t, err, "EncryptRSA(%v, %v) = %v", string(c.data), c.privateKey.PublicKey, err)
 			decryptedBytes, err := DecryptRSA(encryptedBytes, c.privateKey)
 			assert.NoError(t, err, "DecryptRSA(%v, %v) = %v", encryptedBytes, c.privateKey, err)
@@ -111,13 +116,22 @@ func TestEncryptDecryptRSA(t *testing.T) {
 	}
 }
 
+// MockWithCryptographyOptionsError is a mock implementation of CryptographyOptions
+// that can be used for testing error.
+func MockWithCryptographyOptionsError(v string) cryptography.CryptographyOptionsFunc {
+	return func(o *cryptography.CryptographyOptions) error {
+		o.OutputFilename = v
+		return fmt.Errorf("mock error")
+	}
+}
+
 // TestEncryptDecryptRSAInvalid calls the EncryptRSA and DecryptRSA
 // function to make sure errors are returned when invalid parameters are passed.
 func TestEncryptDecryptRSAInvalid(t *testing.T) {
 	cases := map[string]struct {
 		data                 []byte
 		privateKey           *rsa.PrivateKey
-		optFn                func(*CryptographyOptions) error
+		optFn                func(*cryptography.CryptographyOptions) error
 		expectEncErrorString string
 		expectDecErrorString string
 	}{
@@ -189,7 +203,7 @@ func TestSignRSAInvalid(t *testing.T) {
 	cases := map[string]struct {
 		data              []byte
 		privateKey        *rsa.PrivateKey
-		optFn             func(*CryptographyOptions) error
+		optFn             func(*cryptography.CryptographyOptions) error
 		expectErrorString string
 	}{
 		"errornous hash function": {

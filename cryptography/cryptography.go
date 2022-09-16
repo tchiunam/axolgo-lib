@@ -92,7 +92,7 @@ func CreateHash(input string) string {
 }
 
 // Evaluate the functional options and set the options in the CryptographyOptions struct
-func (options *CryptographyOptions) merge(optFns ...CryptographyOptionsFunc) error {
+func (options *CryptographyOptions) Merge(optFns ...CryptographyOptionsFunc) error {
 	for _, optFn := range optFns {
 		if err := optFn(options); err != nil {
 			return fmt.Errorf("Fail to read cryptography options: %v", err)
@@ -106,7 +106,7 @@ func (options *CryptographyOptions) merge(optFns ...CryptographyOptionsFunc) err
 // Returns the encrypted data and an error if any.
 func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	options := CryptographyOptions{HashFunc: CreateHash}
-	if err := options.merge(optFns...); err != nil {
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -127,7 +127,7 @@ func Encrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) 
 // data and an error if any.
 func Decrypt(data []byte, passphrase string, optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	options := CryptographyOptions{HashFunc: CreateHash}
-	if err := options.merge(optFns...); err != nil {
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
@@ -170,7 +170,7 @@ func _cryptFile(
 	passphrase string,
 	optFns ...CryptographyOptionsFunc) ([]byte, error) {
 	var options CryptographyOptions
-	if err := options.merge(optFns...); err != nil {
+	if err := options.Merge(optFns...); err != nil {
 		return nil, err
 	}
 
