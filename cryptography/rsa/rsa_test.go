@@ -168,8 +168,9 @@ func TestEncryptDecryptRSAInvalid(t *testing.T) {
 	}
 }
 
-// TestSignRSA calls the SignRSA to make sure it can sign data
-func TestSignRSA(t *testing.T) {
+// TestSignVerifyRSA calls the SignRSA and VerifyRSA function
+// to make sure message can be signed and verified.
+func TestSignVerifyRSA(t *testing.T) {
 	cases := map[string]struct {
 		data       []byte
 		privateKey *rsa.PrivateKey
@@ -192,19 +193,23 @@ func TestSignRSA(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := SignRSA(c.data, c.privateKey)
+			signature, err := SignRSA(c.data, c.privateKey)
 			assert.NoError(t, err, "SignRSA(%v, %v) = %v", c.data, c.privateKey, err)
+			err = VerifyRSA(c.data, &c.privateKey.PublicKey, signature)
+			assert.NoError(t, err, "VerifyRSA(%v, %v, %v) = %v", c.data, c.privateKey.PublicKey, signature, err)
 		})
 	}
 }
 
-// TestSignRSAInvalid calls the SignRSA to make sure errors are returned
-func TestSignRSAInvalid(t *testing.T) {
+// TestSignVerifyRSAInvalid calls the SignRSA and VerifyRSA function
+// to make sure errors are returned when invalid parameters are passed.
+func TestSignVerifyRSAInvalid(t *testing.T) {
 	cases := map[string]struct {
-		data              []byte
-		privateKey        *rsa.PrivateKey
-		optFn             func(*cryptography.CryptographyOptions) error
-		expectErrorString string
+		data                 []byte
+		privateKey           *rsa.PrivateKey
+		optFn                func(*cryptography.CryptographyOptions) error
+		expectEncErrorString string
+		expectDecErrorString string
 	}{
 		"errornous hash function": {
 			data: []byte("hello world"),
@@ -212,20 +217,26 @@ func TestSignRSAInvalid(t *testing.T) {
 				privateKey, _, _ := GenerateRSAKeyPair(2048)
 				return privateKey
 			}(),
-			optFn:             MockWithCryptographyOptionsError("foo"),
-			expectErrorString: "Fail to read cryptography options: mock error",
+			optFn:                MockWithCryptographyOptionsError("foo"),
+			expectEncErrorString: "Fail to read cryptography options: mock error",
+			expectDecErrorString: "Fail to read cryptography options: mock error",
 		},
 	}
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := SignRSA(c.data, c.privateKey, c.optFn)
+			signature, err := SignRSA(c.data, c.privateKey, c.optFn)
 			assert.Error(t, err, "SignRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
 			assert.Equal(
 				t,
-				c.expectErrorString,
+				c.expectEncErrorString,
 				err.Error(),
 				"SignRSA(%v, %v) = %v", string(c.data), c.privateKey, err)
+			err = VerifyRSA(c.data, &c.privateKey.PublicKey, signature, c.optFn)
+			assert.Error(
+				t,
+				err,
+				"VerifyRSA(%v, %v, %v) = %v", string(c.data), c.privateKey.PublicKey, signature, err)
 		})
 	}
 }
