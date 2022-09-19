@@ -74,17 +74,17 @@ Go package: https://pkg.go.dev/github.com/tchiunam/axolgo-lib
 
 ## Use it with your Go module
 To add as dependency for your package or upgrade to the latest version:
-```
+```console
 go get github.com/tchiunam/axolgo-lib
 ```
 
 To upgrade or downgrade to a specific version:
-```
+```console
 go get github.com/tchiunam/axolgo-lib@v1.2.3
 ```
 
 To remove dependency on your module and downgrade modules:
-```
+```console
 go get github.com/tchiunam/axolgo-lib@none
 ```
 
@@ -92,13 +92,18 @@ See 'go help get' or https://golang.org/ref/mod#go-get for details.
 
 ## Run test
 To run test:
-```
+```console
 go test ./...
 ```
 
 To run test with coverage result:
-```
+```console
 go test -coverpkg=./... ./...
+```
+
+To run test with coverage result and output:
+```console
+go test -coverpkg=./... -coverprofile=coverage.out ./...
 ```
 
 ## Test report
