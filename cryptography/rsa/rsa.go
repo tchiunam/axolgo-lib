@@ -95,3 +95,24 @@ func SignRSA(data []byte, privateKey *rsa.PrivateKey, optFns ...cryptography.Cry
 
 	return rsa.SignPSS(rand.Reader, privateKey, crypto.SHA256, msgHashSum, nil)
 }
+
+// Verify a message using RSA private key
+func VerifyRSA(
+	data []byte,
+	publicKey *rsa.PublicKey,
+	signature []byte,
+	optFns ...cryptography.CryptographyOptionsFunc) error {
+	options := cryptography.CryptographyOptions{OAEPHashFunc: sha256.New()}
+	if err := options.Merge(optFns...); err != nil {
+		return err
+	}
+
+	msgHash := options.OAEPHashFunc
+	_, err := msgHash.Write(data)
+	if err != nil {
+		return err
+	}
+	msgHashSum := msgHash.Sum(nil)
+
+	return rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSum, signature, nil)
+}
