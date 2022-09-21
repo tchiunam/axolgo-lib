@@ -254,3 +254,22 @@ func TestAddSuffixToFileName(t *testing.T) {
 		})
 	}
 }
+
+// TestIntToHex calls IntToHex with an int64 value, checking for a
+// string with the hex value.
+func TestIntToHex(t *testing.T) {
+	cases := map[string]struct {
+		num       int64
+		expectHex []byte
+	}{
+		"normal input": {
+			num: 100,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			assert.NotPanics(t, func() { _ = IntToHex(c.num) }, "IntToHex(%v) panicked", c.num)
+		})
+	}
+}

@@ -24,28 +24,30 @@ package blockchain
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// TestBlockChain tests the blockchain
-func TestBlockChain(t *testing.T) {
+// TestProofOfWork tests the proof of work algorithm
+func TestProofOfWork(t *testing.T) {
 	cases := map[string]struct {
-		data string
+		data []string
 	}{
-		"1st block": {
-			data: "First block",
-		},
-		"2nd block": {
-			data: "Second block",
-		},
-		"3rd block": {
-			data: "Third block",
+		"normal input": {
+			data: []string{"First block", "Second block", "Third block"},
 		},
 	}
 
 	chain := InitBlockChain()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			chain.AddBlock(c.data)
+			for _, d := range c.data {
+				chain.AddBlock(d)
+			}
+			for _, block := range chain.Blocks {
+				pow := NewProof(block)
+				assert.True(t, pow.Validate(), "Proof of work is not valid")
+			}
 		})
 	}
 }

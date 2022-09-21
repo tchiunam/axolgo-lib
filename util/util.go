@@ -23,6 +23,8 @@ THE SOFTWARE.
 package util
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"os/user"
 	"path/filepath"
@@ -97,4 +99,15 @@ func AddPrefixToFileName(path string, prefix string) string {
 // Add suffix to file name
 func AddSuffixToFileName(path string, suffix string) string {
 	return UpdateFilePath(path, UpdateFilePathParams{FileNameSuffix: suffix})
+}
+
+// Covert int to bytes of hex
+func IntToHex(num int64) []byte {
+	buff := new(bytes.Buffer)
+	err := binary.Write(buff, binary.BigEndian, num)
+	if err != nil {
+		panic(err)
+	}
+
+	return buff.Bytes()
 }
