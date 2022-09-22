@@ -22,6 +22,11 @@ THE SOFTWARE.
 
 package blockchain
 
+import (
+	"bytes"
+	"encoding/gob"
+)
+
 type BlockChain struct {
 	Blocks []*Block
 }
@@ -31,13 +36,6 @@ type Block struct {
 	PrevHash []byte
 	Nonce    int
 }
-
-// DeriveHash is a helper function that calculates the hash of the block
-// func (b *Block) DeriveHash() {
-// 	info := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
-// 	hash := sha256.Sum256(info)
-// 	b.Hash = hash[:]
-// }
 
 // CreateBlock creates a new block using the data and the previous block's hash
 func CreateBlock(data string, prevHash []byte) *Block {
@@ -67,4 +65,29 @@ func Gensis() *Block {
 // InitBlockChain creates a new blockchain with a genesis block
 func InitBlockChain() *BlockChain {
 	return &BlockChain{[]*Block{Gensis()}}
+}
+
+// Serialize the block into bytes
+func (b *Block) Serialize() ([]byte, error) {
+	var res bytes.Buffer
+	encorder := gob.NewEncoder(&res)
+
+	err := encorder.Encode(b)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Bytes(), nil
+}
+
+func Deserialize(data []byte) (*Block, error) {
+	var block Block
+
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&block)
+	if err != nil {
+		return nil, err
+	}
+
+	return &block, nil
 }

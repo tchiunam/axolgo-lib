@@ -52,12 +52,14 @@ func NewProof(b *Block) *ProofOfWork {
 
 // Prepare data to run the proof of work algorithm
 func (pow *ProofOfWork) InitData(nonce int) []byte {
+	hexDifficulty, _ := util.IntToHex(int64(Difficulty))
+	hexNonce, _ := util.IntToHex(int64(nonce))
 	data := bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
 			pow.Block.Data,
-			util.IntToHex(int64(Difficulty)),
-			util.IntToHex(int64(nonce)),
+			hexDifficulty,
+			hexNonce,
 		},
 		[]byte{},
 	)
