@@ -22,20 +22,56 @@ THE SOFTWARE.
 
 package blockchain
 
-// BlockChain structure
-type BlockChain struct {
-	Blocks []*Block
+import (
+	"bytes"
+	"encoding/gob"
+)
+
+type Block struct {
+	Hash     []byte
+	Data     []byte
+	PrevHash []byte
+	Nonce    int
 }
 
-// InitBlockChain creates a new blockchain with a genesis block
-func InitBlockChain() *BlockChain {
-	return &BlockChain{[]*Block{Gensis()}}
+// CreateBlock creates a new block using the data and the previous block's hash
+func CreateBlock(data string, prevHash []byte) *Block {
+	block := &Block{[]byte{}, []byte(data), prevHash, 0}
+	pow := NewProof(block)
+	nonce, hash := pow.Run()
+
+	block.Hash = hash[:]
+	block.Nonce = nonce
+
+	return block
 }
 
-// AddBlock is a helper function that adds a new block to the chain using
-// the previous block's hash
-func (chain *BlockChain) AddBlock(data string) {
-	prevBlock := chain.Blocks[len(chain.Blocks)-1]
-	new := CreateBlock(data, prevBlock.Hash)
-	chain.Blocks = append(chain.Blocks, new)
+// Genesis creates the first block in the chain
+func Gensis() *Block {
+	return CreateBlock("Gensis", []byte{})
+}
+
+// Serialize the block into bytes
+func (b *Block) Serialize() ([]byte, error) {
+	var res bytes.Buffer
+	encorder := gob.NewEncoder(&res)
+
+	err := encorder.Encode(b)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Bytes(), nil
+}
+
+func Deserialize(data []byte) (*Block, error) {
+	var block Block
+
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&block)
+	if err != nil {
+		return nil, err
+	}
+
+	return &block, nil
 }
