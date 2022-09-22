@@ -23,6 +23,7 @@ THE SOFTWARE.
 package util
 
 import (
+	"errors"
 	"fmt"
 	"os/user"
 	"testing"
@@ -270,6 +271,24 @@ func TestIntToHex(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			_, err := IntToHex(c.num)
 			assert.NoError(t, err, "IntToHex(%v) = %v, want %v", c.num, err, nil)
+		})
+	}
+}
+
+// TestPanicOnErrror calls PanicOnError with an error, checking for a
+// panic.
+func TestPanicOnError(t *testing.T) {
+	cases := map[string]struct {
+		err error
+	}{
+		"normal input": {
+			err: errors.New("test error"),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			assert.Panics(t, func() { PanicOnError(c.err) })
 		})
 	}
 }

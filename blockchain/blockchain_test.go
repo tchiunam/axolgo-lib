@@ -23,10 +23,21 @@ THE SOFTWARE.
 package blockchain
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// Clean up the test database
+func _cleanTestBadgerDatabase(
+	dbPath string) {
+	// Delete the database files from the dbPath
+	if _, err := os.Stat(dbPath); err == nil {
+		os.RemoveAll(dbPath)
+	}
+}
 
 // TestBlockChain tests the blockchain
 func TestBlockChain(t *testing.T) {
@@ -44,22 +55,21 @@ func TestBlockChain(t *testing.T) {
 		},
 	}
 
-	chain := InitBlockChain()
+	dbPath := filepath.Join("testdata", "db", "blockchain")
+	os.MkdirAll(dbPath, 0755)
+	defer _cleanTestBadgerDatabase(dbPath)
+
+	chain := InitBlockChain(dbPath)
+	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			// Test adding a block
 			assert.NotPanics(t, func() { chain.AddBlock(c.data) }, "AddBlock should not panic")
-
-			// Test to serialize a block
-			block := chain.Blocks[len(chain.Blocks)-1]
-			serializedBlock, err := block.Serialize()
-			assert.NotNil(t, serializedBlock, "Serialized block should not be nil")
-			assert.NoError(t, err, "Serialize should not return an error: %v", err)
-
-			// Test to deserialize bytes of a block
-			deserializedBlock, err := Deserialize(serializedBlock)
-			assert.NotNil(t, deserializedBlock, "Deserialized block should not be nil")
-			assert.NoError(t, err, "Deserialize should not return an error: %v", err)
 		})
 	}
+
+	// Get the chain with initialized blocks
+	assert.NotPanics(
+		t,
+		func() { InitBlockChain(filepath.Join("testdata", "db", "genesis")) },
+		"InitBlockChain should not panic")
 }
