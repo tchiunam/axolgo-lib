@@ -102,12 +102,12 @@ func AddSuffixToFileName(path string, suffix string) string {
 }
 
 // Covert int to bytes of hex
-func IntToHex(num int64) []byte {
+func IntToHex(num int64) ([]byte, error) {
 	buff := new(bytes.Buffer)
 	err := binary.Write(buff, binary.BigEndian, num)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return buff.Bytes()
+	return buff.Bytes(), nil
 }

@@ -24,6 +24,8 @@ package blockchain
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestBlockChain tests the blockchain
@@ -45,7 +47,19 @@ func TestBlockChain(t *testing.T) {
 	chain := InitBlockChain()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			chain.AddBlock(c.data)
+			// Test adding a block
+			assert.NotPanics(t, func() { chain.AddBlock(c.data) }, "AddBlock should not panic")
+
+			// Test to serialize a block
+			block := chain.Blocks[len(chain.Blocks)-1]
+			serializedBlock, err := block.Serialize()
+			assert.NotNil(t, serializedBlock, "Serialized block should not be nil")
+			assert.NoError(t, err, "Serialize should not return an error: %v", err)
+
+			// Test to deserialize bytes of a block
+			deserializedBlock, err := Deserialize(serializedBlock)
+			assert.NotNil(t, deserializedBlock, "Deserialized block should not be nil")
+			assert.NoError(t, err, "Deserialize should not return an error: %v", err)
 		})
 	}
 }
