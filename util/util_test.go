@@ -23,6 +23,7 @@ THE SOFTWARE.
 package util
 
 import (
+	"errors"
 	"fmt"
 	"os/user"
 	"testing"
@@ -251,6 +252,43 @@ func TestAddSuffixToFileName(t *testing.T) {
 				c.expectPath,
 				path,
 				"AddSuffixToFileName(%v, %v) = %v, want %v", c.path, c.suffix, path, c.expectPath)
+		})
+	}
+}
+
+// TestIntToHex calls IntToHex with an int64 value, checking for a
+// string with the hex value.
+func TestIntToHex(t *testing.T) {
+	cases := map[string]struct {
+		num int64
+	}{
+		"normal input": {
+			num: 100,
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			_, err := IntToHex(c.num)
+			assert.NoError(t, err, "IntToHex(%v) = %v, want %v", c.num, err, nil)
+		})
+	}
+}
+
+// TestPanicOnErrror calls PanicOnError with an error, checking for a
+// panic.
+func TestPanicOnError(t *testing.T) {
+	cases := map[string]struct {
+		err error
+	}{
+		"normal input": {
+			err: errors.New("test error"),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			assert.Panics(t, func() { PanicOnError(c.err) })
 		})
 	}
 }
