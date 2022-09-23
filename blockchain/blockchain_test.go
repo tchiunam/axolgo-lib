@@ -39,19 +39,32 @@ func _cleanTestBadgerDatabase(
 	}
 }
 
-// TestBlockChain tests the blockchain
+// TestBlockChain tests transaction operations on the blockchain
 func TestBlockChain(t *testing.T) {
 	cases := map[string]struct {
-		data string
+		from   string
+		to     string
+		amount int
 	}{
-		"1st block": {
-			data: "First block",
+		"tx 1": {
+			from:   "John",
+			to:     "Jane",
+			amount: 20,
 		},
-		"2nd block": {
-			data: "Second block",
+		"tx 2": {
+			from:   "John",
+			to:     "Mary",
+			amount: 30,
 		},
-		"3rd block": {
-			data: "Third block",
+		"tx 3": {
+			from:   "Mary",
+			to:     "Nancy",
+			amount: 10,
+		},
+		"tx 4": {
+			from:   "Nancy",
+			to:     "John",
+			amount: 5,
 		},
 	}
 
@@ -59,17 +72,29 @@ func TestBlockChain(t *testing.T) {
 	os.MkdirAll(dbPath, 0755)
 	defer _cleanTestBadgerDatabase(dbPath)
 
-	chain := InitBlockChain(dbPath)
+	chain := InitBlockChain(dbPath, "John")
 	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			assert.NotPanics(t, func() { chain.AddBlock(c.data) }, "AddBlock should not panic")
+			tx, err := NewTransaction(c.from, c.to, c.amount, chain)
+			assert.Nil(t, err, "NewTransaction should not return an error")
+			assert.NotNil(t, tx, "NewTransaction should return a transaction")
+			chain.AddBlock([]*Transaction{tx})
 		})
 	}
+	// Close the database connection so that we can open it again
+	chain.Database.Close()
 
-	// Get the chain with initialized blocks
-	assert.NotPanics(
-		t,
-		func() { InitBlockChain(filepath.Join("testdata", "db", "genesis")) },
-		"InitBlockChain should not panic")
+	t.Run("Verify John's balance", func(t *testing.T) {
+		chain := ContinueBlockChain(dbPath)
+
+		balance := 0
+		UTXOs := chain.FindUTXO("John")
+
+		for _, out := range UTXOs {
+			balance += out.Value
+		}
+
+		assert.Equal(t, 55, balance, "Balance of John should be 55")
+	})
 }
