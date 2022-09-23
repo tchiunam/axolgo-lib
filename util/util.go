@@ -111,3 +111,10 @@ func IntToHex(num int64) ([]byte, error) {
 
 	return buff.Bytes(), nil
 }
+
+// Panic if there is error
+func PanicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

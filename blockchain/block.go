@@ -25,6 +25,8 @@ package blockchain
 import (
 	"bytes"
 	"encoding/gob"
+
+	"github.com/tchiunam/axolgo-lib/util"
 )
 
 type Block struct {
@@ -47,31 +49,28 @@ func CreateBlock(data string, prevHash []byte) *Block {
 }
 
 // Genesis creates the first block in the chain
-func Gensis() *Block {
-	return CreateBlock("Gensis", []byte{})
+func Genesis() *Block {
+	return CreateBlock("Genesis", []byte{})
 }
 
 // Serialize the block into bytes
-func (b *Block) Serialize() ([]byte, error) {
+func (b *Block) Serialize() []byte {
 	var res bytes.Buffer
 	encorder := gob.NewEncoder(&res)
 
 	err := encorder.Encode(b)
-	if err != nil {
-		return nil, err
-	}
+	util.PanicOnError(err)
 
-	return res.Bytes(), nil
+	return res.Bytes()
 }
 
-func Deserialize(data []byte) (*Block, error) {
+// Deserializes the data of a block
+func Deserialize(data []byte) *Block {
 	var block Block
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 	err := decoder.Decode(&block)
-	if err != nil {
-		return nil, err
-	}
+	util.PanicOnError(err)
 
-	return &block, nil
+	return &block
 }

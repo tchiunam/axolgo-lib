@@ -23,6 +23,8 @@ THE SOFTWARE.
 package blockchain
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,16 +40,30 @@ func TestProofOfWork(t *testing.T) {
 		},
 	}
 
-	chain := InitBlockChain()
+	dbPath := filepath.Join("testdata", "db", "proof-of-work")
+	os.MkdirAll(dbPath, 0755)
+	defer _cleanTestBadgerDatabase(dbPath)
+
+	chain := InitBlockChain(dbPath)
+	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			for _, d := range c.data {
 				chain.AddBlock(d)
 			}
-			for _, block := range chain.Blocks {
-				pow := NewProof(block)
-				assert.True(t, pow.Validate(), "Proof of work is not valid")
-			}
 		})
 	}
+
+	t.Run("Iterating all blocks", func(t *testing.T) {
+		iterator := chain.Iterator()
+		for {
+			block := iterator.Next()
+			pow := NewProof(block)
+			assert.True(t, pow.Validate(), "Proof of work is not valid")
+
+			if len(block.PrevHash) == 0 {
+				break
+			}
+		}
+	})
 }
