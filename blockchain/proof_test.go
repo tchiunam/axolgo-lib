@@ -33,10 +33,29 @@ import (
 // TestProofOfWork tests the proof of work algorithm
 func TestProofOfWork(t *testing.T) {
 	cases := map[string]struct {
-		data []string
+		from   string
+		to     string
+		amount int
 	}{
-		"normal input": {
-			data: []string{"First block", "Second block", "Third block"},
+		"tx 1": {
+			from:   "John",
+			to:     "Jane",
+			amount: 20,
+		},
+		"tx 2": {
+			from:   "John",
+			to:     "Mary",
+			amount: 30,
+		},
+		"tx 3": {
+			from:   "Mary",
+			to:     "Nancy",
+			amount: 10,
+		},
+		"tx 4": {
+			from:   "Nancy",
+			to:     "John",
+			amount: 5,
 		},
 	}
 
@@ -44,17 +63,23 @@ func TestProofOfWork(t *testing.T) {
 	os.MkdirAll(dbPath, 0755)
 	defer _cleanTestBadgerDatabase(dbPath)
 
-	chain := InitBlockChain(dbPath)
+	chain := InitBlockChain(dbPath, "John")
 	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			for _, d := range c.data {
-				chain.AddBlock(d)
-			}
+			t.Run(name, func(t *testing.T) {
+				tx, err := NewTransaction(c.from, c.to, c.amount, chain)
+				assert.Nil(t, err, "NewTransaction should not return an error")
+				assert.NotNil(t, tx, "NewTransaction should return a transaction")
+				chain.AddBlock([]*Transaction{tx})
+			})
 		})
 	}
+	// Close the database connection so that we can open it again
+	chain.Database.Close()
 
 	t.Run("Iterating all blocks", func(t *testing.T) {
+		chain := ContinueBlockChain(dbPath)
 		iterator := chain.Iterator()
 		for {
 			block := iterator.Next()
