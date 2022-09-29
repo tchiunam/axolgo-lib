@@ -67,12 +67,10 @@ func TestProofOfWork(t *testing.T) {
 	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			t.Run(name, func(t *testing.T) {
-				tx, err := NewTransaction(c.from, c.to, c.amount, chain)
-				assert.Nil(t, err, "NewTransaction should not return an error")
-				assert.NotNil(t, tx, "NewTransaction should return a transaction")
-				chain.AddBlock([]*Transaction{tx})
-			})
+			tx, err := NewTransaction(c.from, c.to, c.amount, chain)
+			assert.Nil(t, err, "NewTransaction should not return an error")
+			assert.NotNil(t, tx, "NewTransaction should return a transaction")
+			chain.AddBlock([]*Transaction{tx})
 		})
 	}
 	// Close the database connection so that we can open it again
