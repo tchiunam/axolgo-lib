@@ -76,10 +76,8 @@ func TestBlockChain(t *testing.T) {
 	defer chain.Database.Close()
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			tx, err := NewTransaction(c.from, c.to, c.amount, chain)
-			assert.Nil(t, err, "NewTransaction should not return an error")
-			assert.NotNil(t, tx, "NewTransaction should return a transaction")
-			chain.AddBlock([]*Transaction{tx})
+			tx, _ := NewTransaction(c.from, c.to, c.amount, chain)
+			assert.NotPanics(t, func() { chain.AddBlock([]*Transaction{tx}) }, "AddBlock should not panic")
 		})
 	}
 	// Close the database connection so that we can open it again
@@ -96,5 +94,22 @@ func TestBlockChain(t *testing.T) {
 		}
 
 		assert.Equal(t, 55, balance, "Balance of John should be 55")
+		// Close the database connection so that we can open it again
+		chain.Database.Close()
+	})
+
+	t.Run("Verify PoW", func(t *testing.T) {
+		chain := ContinueBlockChain(dbPath)
+
+		iterator := chain.Iterator()
+		for {
+			block := iterator.Next()
+			pow := NewProof(block)
+			assert.True(t, pow.Validate(), "Proof of work is not valid")
+
+			if len(block.PrevHash) == 0 {
+				break
+			}
+		}
 	})
 }
