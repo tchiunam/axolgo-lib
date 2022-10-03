@@ -292,3 +292,52 @@ func TestPanicOnError(t *testing.T) {
 		})
 	}
 }
+
+// TestBase58Encode calls Base58Encode with a byte slice, checking for
+// a string with the base58 encoded value.
+func TestBase58Encode(t *testing.T) {
+	cases := map[string]struct {
+		input    []byte
+		expected string
+	}{
+		"letters": {
+			input:    []byte("a string with letters"),
+			expected: "6yQQh2dfWsX5SB1g7v6UtszbTKPia",
+		},
+		"letters and numbers": {
+			input:    []byte("we have 1234567890"),
+			expected: "5xE2ud5XgzbUEVhn89vmKXvPq",
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			encoded := Base58Encode(c.input)
+			assert.Equal(t, c.expected, string(encoded))
+		})
+	}
+}
+
+func TestBase58Decode(t *testing.T) {
+	cases := map[string]struct {
+		input    string
+		expected []byte
+	}{
+		"letters": {
+			input:    "6yQQh2dfWsX5SB1g7v6UtszbTKPia",
+			expected: []byte("a string with letters"),
+		},
+		"letters and numbers": {
+			input:    "5xE2ud5XgzbUEVhn89vmKXvPq",
+			expected: []byte("we have 1234567890"),
+		},
+	}
+
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			decoded, err := Base58Decode([]byte(c.input))
+			assert.Equal(t, c.expected, decoded)
+			assert.NoError(t, err)
+		})
+	}
+}
