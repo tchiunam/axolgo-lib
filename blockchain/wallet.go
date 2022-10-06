@@ -23,6 +23,7 @@ THE SOFTWARE.
 package blockchain
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -43,7 +44,7 @@ type Wallet struct {
 	PublicKey  []byte
 }
 
-// Get the address of the wallet
+// Address gets the address of the wallet
 func (w Wallet) Address() []byte {
 	pubKeyHash := PublicKeyHash(w.PublicKey)
 
@@ -56,7 +57,22 @@ func (w Wallet) Address() []byte {
 	return address
 }
 
-// Generates a public and private key pair
+// ValidateAddress checks if the address is valid
+func ValidateAddress(address string) bool {
+	pubKeyHash, err := util.Base58Decode([]byte(address))
+	if err != nil {
+		return false
+	}
+
+	actualChecksum := pubKeyHash[len(pubKeyHash)-checksumLength:]
+	version := pubKeyHash[0]
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-checksumLength]
+	targetChecksum := Checksum(append([]byte{version}, pubKeyHash...))
+
+	return bytes.Compare(actualChecksum, targetChecksum) == 0
+}
+
+// NewKeyPair generates a public and private key pair
 func NewKeyPair() (ecdsa.PrivateKey, []byte) {
 	curve := elliptic.P256()
 
@@ -70,7 +86,7 @@ func NewKeyPair() (ecdsa.PrivateKey, []byte) {
 	return *private, pub
 }
 
-// Creates a new wallet
+// MakeWallet creates a new wallet
 func MakeWallet() *Wallet {
 	private, public := NewKeyPair()
 	wallet := Wallet{private, public}
@@ -78,7 +94,7 @@ func MakeWallet() *Wallet {
 	return &wallet
 }
 
-// Generates a public key hash
+// PublicKeyHash generates a public key hash
 func PublicKeyHash(pubKey []byte) []byte {
 	pubKeyHash := sha256.Sum256(pubKey)
 
@@ -93,7 +109,7 @@ func PublicKeyHash(pubKey []byte) []byte {
 	return publicRipMD
 }
 
-// Generates a checksum of the public key hash
+// Checksum generates a checksum of the public key hash
 func Checksum(payload []byte) []byte {
 	firstHash := sha256.Sum256(payload)
 	secondHash := sha256.Sum256(firstHash[:])
