@@ -36,18 +36,20 @@ type Wallets struct {
 	Wallets map[string]*Wallet
 }
 
+var WalletFilePath = "./wallets.dat"
+
 // Create wallets
-func CreateWallets(filePath string) (*Wallets, error) {
+func CreateWallets() (*Wallets, error) {
 	wallets := Wallets{}
 	wallets.Wallets = make(map[string]*Wallet)
 
-	err := wallets.LoadFromFile(filePath)
+	err := wallets.LoadFromFile(WalletFilePath)
 
 	return &wallets, err
 }
 
 // Save the wallets to a file
-func (ws *Wallets) Persist(filePath string) error {
+func (ws *Wallets) Persist() error {
 	var content bytes.Buffer
 
 	gob.Register(elliptic.P256())
@@ -58,7 +60,7 @@ func (ws *Wallets) Persist(filePath string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filePath, content.Bytes(), 0644)
+	err = ioutil.WriteFile(WalletFilePath, content.Bytes(), 0644)
 	if err != nil {
 		return err
 	}

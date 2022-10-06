@@ -43,14 +43,14 @@ func TestWallets(t *testing.T) {
 	wallet := wallets.GetWallet(addresses[0])
 	assert.NotNil(t, wallet)
 
-	walletFilePath := filepath.Join("testdata", "wallets.dat")
-	err := wallets.Persist(walletFilePath)
+	WalletFilePath = filepath.Join("testdata", "wallets.dat")
+	err := wallets.Persist()
 	// defer os.Remove(walletFilePath)
 
 	// Having a bug to be fixed here
 	assert.Error(t, err)
 
-	CreateWallets(walletFilePath)
+	CreateWallets()
 	// assert.NoError(t, err)
 	// assert.NotNil(t, walletsLoaded)
 }
