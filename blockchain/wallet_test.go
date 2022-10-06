@@ -39,4 +39,5 @@ func TestWallet(t *testing.T) {
 	address := wallet.Address()
 
 	assert.NotNil(t, address)
+	assert.True(t, ValidateAddress(string(address)))
 }
