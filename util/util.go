@@ -29,6 +29,8 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	"github.com/mr-tron/base58"
 )
 
 // Expand tilde to home directory
@@ -117,4 +119,21 @@ func PanicOnError(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// Base58 encoding
+func Base58Encode(input []byte) []byte {
+	encode := base58.Encode(input)
+
+	return []byte(encode)
+}
+
+// Base58 decoding
+func Base58Decode(input []byte) ([]byte, error) {
+	decode, err := base58.Decode(string(input[:]))
+	if err != nil {
+		return nil, err
+	}
+
+	return decode, nil
 }
