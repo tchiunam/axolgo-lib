@@ -25,6 +25,7 @@ package network
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"syscall"
 
 	"github.com/vrecan/death/v3"
@@ -113,10 +114,13 @@ func BytesToCmd(bytes []byte) string {
 	return fmt.Sprintf("%s", command)
 }
 
+// CloseDB safely closes the database when the program is terminated
 func CloseDB(chain *blockchain.BlockChain) {
 	d := death.NewDeath(syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 
 	d.WaitForDeathWithFunc(func() {
+		defer os.Exit(1)
+		defer runtime.Goexit()
 		chain.Database.Close()
 	})
 }

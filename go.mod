@@ -7,13 +7,13 @@ require (
 	github.com/mr-tron/base58 v1.2.0
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
+	github.com/vrecan/death/v3 v3.0.3
 	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
 	gopkg.in/ini.v1 v1.67.0
 )
 
 require (
 	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
@@ -33,7 +33,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
-	github.com/vrecan/death/v3 v3.0.3 // indirect
 	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
