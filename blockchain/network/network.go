@@ -24,6 +24,10 @@ package network
 
 import (
 	"fmt"
+	"os"
+	"syscall"
+
+	"github.com/vrecan/death/v3"
 
 	"github.com/tchiunam/axolgo-lib/blockchain"
 )
@@ -107,4 +111,12 @@ func BytesToCmd(bytes []byte) string {
 	}
 
 	return fmt.Sprintf("%s", command)
+}
+
+func CloseDB(chain *blockchain.BlockChain) {
+	d := death.NewDeath(syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+
+	d.WaitForDeathWithFunc(func() {
+		chain.Database.Close()
+	})
 }
